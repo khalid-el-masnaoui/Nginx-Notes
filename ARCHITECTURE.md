@@ -68,3 +68,7 @@ In most cases, the recommended NGINX configuration of one worker process per CPU
 When the NGINX server is active, only the worker process is busy. Each worker process handles multiple connections in a non-blocking manner, reducing the number of context switches.
 
 Each worker process is single-threaded and runs independently to acquire and process new connections. Processes can communicate using shared memory to obtain shared cache data, session persistent data, and other shared resources.
+
+<p align="center">
+<img src="./images/nginx_ps_model.png"/>
+</p>
