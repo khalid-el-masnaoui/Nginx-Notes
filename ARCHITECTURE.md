@@ -52,3 +52,19 @@ Traditional process- or _thread-based_ models of handling _concurrent connection
 From the very beginning, nginx was meant to be a specialized tool to achieve more performance, density and economical use of server resources while enabling dynamic growth of a website, so it has followed a different model. It was actually inspired by the ongoing development of advanced event-based mechanisms in a variety of operating systems. What resulted is a _modular_, _event-driven_, _asynchronous_, _single-threaded_, _non-blocking_ architecture which became the foundation of nginx code (NGINX uses the _master-slave_ design).
 
 nginx uses _multiplexing_ and _event notifications_ heavily, and dedicates specific tasks to separate processes. Connections are processed in a highly efficient run-loop in a limited number of single-threaded processes called `worker`s. Within each `worker` nginx can handle many thousands of concurrent connections and requests per second.
+
+#### Core Structure
+
+NGINX adheres to the master-slave design in the following : 
+
+- **Masters** read and validate configurations by creating, binding, and crossing sockets. They also handle starting, terminations, and maintaining the number of configured worker processes (s_laves_). The master node can also reconfigure the worker process with no service interruption.(reading configuration and binding to ports..)
+- **Workers** accept new requests from a shared listen socket and execute highly efficient run loops inside each worker to process thousands of requests. They do all of the work! They handle network connections, read and write content to disk, and communicate with upstream servers.
+- **Proxy caches** are special processes. They have a _cache loader_ and _manager_. 
+	- The **cache loader** checks the disk cache item and populates the engine’s in-memory database with the cache metadata. It prepares the NGINX instances to work with the files already stored on the disk in a specifically allocated structure. Runs at startup to load the disk‑based cache into memory, and then exits. It is scheduled conservatively, so its resource demands are low.
+	- The **cache manager** handles cache expiration and invalidation. Runs periodically and prunes entries from the disk caches to keep them within the configured sizes.
+
+In most cases, the recommended NGINX configuration of one worker process per CPU core makes the most efficient use of hardware resources. It can be customized by setting the worker_processes directive in NGINX configuration.
+
+When the NGINX server is active, only the worker process is busy. Each worker process handles multiple connections in a non-blocking manner, reducing the number of context switches.
+
+Each worker process is single-threaded and runs independently to acquire and process new connections. Processes can communicate using shared memory to obtain shared cache data, session persistent data, and other shared resources.
