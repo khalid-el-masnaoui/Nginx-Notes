@@ -72,3 +72,12 @@ Each worker process is single-threaded and runs independently to acquire and pro
 <p align="center">
 <img src="./images/nginx_ps_model.png"/>
 </p>
+
+While handling a variety of actions associated with accepting, processing and managing network connections and content retrieval, nginx uses event notification mechanisms and a number of disk I/O performance enhancements in Linux, Solaris and BSD-based operating systems, like `kqueue`, `epoll`, and `event ports`. The goal is to provide as many hints to the operating system as possible, in regards to obtaining timely asynchronous feedback for inbound and outbound traffic, disk operations, reading from or writing to sockets, timeouts and so on. The usage of different methods for multiplexing and advanced I/O operations is heavily optimized for every Unix-based operating system nginx runs on.
+
+
+Nginx uses an asynchronous, non-blocking event handling mechanism. Specific to system calls is a system call like `Select/poll/epoll/kqueue`. This mechanism solves both problems with blocking and non-blocking mechanisms (constant checking). 
+
+<p align="center">
+<img src="./images/high_level_nginx_architecture.png"/>
+</p>
