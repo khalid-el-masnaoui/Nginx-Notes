@@ -29,11 +29,19 @@ Event-driven architecture is often referred to as “**_asynchronous_**” commu
 <img src="./images/eda.svg"/>
 </p>
 
-##### What is an event?
+###### What is an event?
 
 An event is any significant occurrence or change in state for system hardware or software , or more broadly anything that can be noticed and recorded by an application or device, and shared with other applications and devices. All of the things that happen _within_ and _to_ your enterprise are events – customer requests, inventory updates, sensor readings, etc.
 
+###### How does event-driven architecture work?
 
+Event-driven architecture is made up of event producers and event consumers. An event producer detects or senses an event and represents the event as a message. It does not know the consumer of the event, or the outcome of an event. 
+
+After an event has been detected, it is transmitted from the event producer to the event consumers through event channels, where an event processing platform processes the event _asynchronously_. Event consumers need to be informed when an event has occurred. They might process the event or may only be impacted by it. 
+
+The event processing platform will execute the correct response to an event and send the activity downstream to the right consumers. This downstream activity is where the outcome of an event is seen.
+
+**In conclusion** : The components of an event-driven architecture can include three parts: _producer_, _consumer_, _broker_. The broker can be optional, particularly when you have a single producer and a single consumer that are in direct communication with each other and the producer just sends the events to the consumer. An example would be a producer that is sending only to a database or data warehouse so the events are collected and stored for analysis. Most commonly in enterprises, you have multiple sources sending out all types of events with one or more consumers interested in some or all of those events.
 
 
 #### Asynchronous Architecture
