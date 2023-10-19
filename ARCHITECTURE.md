@@ -31,6 +31,9 @@ Event-driven architecture is often referred to as “**_asynchronous_**” commu
 
 ##### What is an event?
 
+An event is any significant occurrence or change in state for system hardware or software , or more broadly anything that can be noticed and recorded by an application or device, and shared with other applications and devices. All of the things that happen _within_ and _to_ your enterprise are events – customer requests, inventory updates, sensor readings, etc.
+
+
 
 
 #### Asynchronous Architecture
