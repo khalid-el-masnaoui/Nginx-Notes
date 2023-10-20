@@ -144,6 +144,18 @@ With FastCGI, multiple requests can be handled over a single connection, which i
 
 Although the connection might be closed at this point, the web server and the process still persist. This offers many advantages. For example, it means that the server and application process can be shut down or restarted separately.
 
+#### FastCGI Advantages
+
+The FastCGI interface combines the best aspects of CGI and vendor APIs. Like CGI, FastCGI applications run in separate, isolated processes. FastCGI’s advantages include:
+
+- **Performance.** FastCGI processes are persistent-they are reused to handle multiple requests. This solves the CGI performance problem of creating new processes for each request.
+- **Simplicity, with easy migration from CGI.** The FastCGI application library (described on page 9) simplifies the migration of existing CGI applications. Applications built with the application library can also run as CGI programs, for backward compatibility with old Web servers.
+- **Language independence.** Like CGI, FastCGI applications can be written in any language, not just languages supported by the vendor API.
+- **Process isolation.** A buggy FastCGI application cannot crash or corrupt the core server or other applications. A malicious FastCGI application cannot steal any secrets (such as session keys for encryption) from the Web server.
+- **Non-proprietary.** FastCGI is supported in all of Open Market’s server products, and support is under development for other Web servers, including the freely available Apache and NCSA servers, as well as commercial servers from Microsoft and Netscape.
+- **Architecture independence.** The FastCGI interface is not tied to a particular server architecture. Any Web server can implement the FastCGI interface. Also, FastCGI does not impose any architecture on the application: applications can be single or multi-threaded, regardless of the threading architecture of the Web server.
+- **Support for distributed computing.** FastCGI provides the ability to run applications remotely, which is useful for distributing load and managing external Web sites.
+
 
 
 ##### [References]
