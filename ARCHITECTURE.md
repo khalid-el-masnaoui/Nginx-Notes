@@ -4,22 +4,22 @@ Notes about nginx , nginx architecture, what is and how FastCGI works and other 
 
 # Table Of Contents
 
-- **[Introduction](#)**
-	-  **[What is Nginx?](#)**
-	- **[Event-Driven Architecture](#)**
-		- **[What is Event-driver Architecture?](#)**
-		- **[What is an event?](#)**
-		- **[How does event-driven architecture work?](#)**
-- **[Nginx Architecture](#)**
-	- **[Overview of nginx Architecture](#)**
-	- **[Core Structure](#)**
-	- **[Workers Model](#)**
-	- **[Nginx Process Roles](#)**
-- **[Nginx FastCGI](#)**
-	- **[FastCGI Advantages](#)**
-	- **[FastCGI Advantages](#)**
-	- **[FastCGI vs CGI Interfaces](#)**
-	- **[Example ](#)**
+- **[Introduction](#introduction)**
+	-  **[What is Nginx?](#what-is-nginx)**
+	- **[Event-Driven Architecture](#vent-driven-architecture)**
+		- **[What is Event-driver Architecture?](#what-is-event-driver-architecture)**
+		- **[What is an event?](#what-is-an-event)**
+		- **[How does event-driven architecture work?](#how-does-event-driven-architecture-work)**
+- **[Nginx Architecture](#ginx-architecture-1)**
+	- **[Overview of nginx Architecture](#overview-of-nginx-architecture)**
+	- **[Core Structure](#core-structure)**
+	- **[Workers Model](#workers-model)**
+	- **[Nginx Process Roles](#nginx-process-roles)**
+- **[Nginx FastCGI](#ginx-fastcgi)**
+	- **[Introduction](#introduction-1)**
+	- **[FastCGI Advantages](#fastcgi-advantages)**
+	- **[FastCGI vs CGI Interfaces](#fastcgi-vs-cgi-interfaces)**
+	- **[Example ](#example)**
 
 
 ## Introduction
