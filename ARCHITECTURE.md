@@ -156,6 +156,33 @@ The FastCGI interface combines the best aspects of CGI and vendor APIs. Like CGI
 - **Architecture independence.** The FastCGI interface is not tied to a particular server architecture. Any Web server can implement the FastCGI interface. Also, FastCGI does not impose any architecture on the application: applications can be single or multi-threaded, regardless of the threading architecture of the Web server.
 - **Support for distributed computing.** FastCGI provides the ability to run applications remotely, which is useful for distributing load and managing external Web sites.
 
+## FastCGI vs CGI Interfaces
+
+The functionality provided by the FastCGI interface is very similar to that provided by CGI. To best understand the FastCGI protocol, we review the CGI interface here. Basic CGI request processing proceeds as follows:
+
+1. For each request, the server creates a new process and the process initializes itself.
+2. The Web server passes the request information (such as remote host, username, HTTP headers, etc.) to the CGI program in environment variables.
+3. The Web server sends any client input (such as user-entered field values from an HTML form) to the CGI program’s standard input.
+4. The CGI program writes any output to be returned to the client on standard output. Error information written to standard error is logged by the Web server.
+5. When the CGI process exits, the request is complete.
+
+FastCGI is conceptually very similar to CGI, with two major differences:
+
+- FastCGI processes are persistent: after finishing a request, they wait for a new request instead of exiting.
+- Instead of using operating system environment variables and pipes, the FastCGI protocol multiplexes the environment information, standard input, output and error over a single full-duplex connection. This allows FastCGI programs to run on remote machines, using TCP connections between the Web server and the FastCGI application.
+
+Request processing in a single-threaded FastCGI application proceeds as follows:
+
+1. The Web server creates FastCGI application processes to handle requests. The processes may be created at startup, or created on demand.
+2. The FastCGI program initializes itself, and waits for a new connection from the Web server.
+3. When a client request comes in, the Web server opens a connection to the FastCGI process. The server sends the CGI environment variable information and standard input over the connection.
+4. The FastCGI process sends the standard output and error information back to the server over the same connection.
+5. When the FastCGI process closes the connection, the request is complete. The FastCGI process then waits for another connection from the Web server.
+
+FastCGI applications can run locally (on the same machine as the Web server) or remotely. For local applications, the server uses a full-duplex pipe to connect to the FastCGI application process. For remote applications, the server uses a TCP connection.
+
+FastCGI applications can be single-threaded or multi-threaded. For single threaded applications, the Web server maintains a pool of processes (if the application is running locally) to handle client requests. The size of the pool is user configurable. Multi-threaded FastCGI applications may accept multiple connections from the Web server and handle them simultaneously in a single process. (For example, Java’s built-in multi-threading, garbage collection, synchronization primitives, and platform independence make it a natural implementation language for multi-threaded FastCGI applications.)
+
 
 
 ##### [References]
