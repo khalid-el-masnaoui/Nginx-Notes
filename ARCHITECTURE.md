@@ -183,7 +183,11 @@ FastCGI applications can run locally (on the same machine as the Web server) or 
 
 FastCGI applications can be single-threaded or multi-threaded. For single threaded applications, the Web server maintains a pool of processes (if the application is running locally) to handle client requests. The size of the pool is user configurable. Multi-threaded FastCGI applications may accept multiple connections from the Web server and handle them simultaneously in a single process. (For example, Java’s built-in multi-threading, garbage collection, synchronization primitives, and platform independence make it a natural implementation language for multi-threaded FastCGI applications.)
 
+#### Example 
 
+One of the main use-cases of FastCGI proxying within Nginx is for PHP processing. Unlike Apache, which can handle PHP processing directly with the use of the `mod_php` module, Nginx must rely on a separate PHP processor to handle PHP requests. Most often, this processing is handled with `php-fpm`, a PHP processor that has been extensively tested to work with Nginx.
+
+Nginx with FastCGI can be used with applications using other languages so long as there is an accessible component configured to respond to FastCGI requests.
 
 ##### [References]
 [https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
