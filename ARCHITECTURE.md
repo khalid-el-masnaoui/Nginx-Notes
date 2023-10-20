@@ -110,6 +110,25 @@ The NGINX worker processes begin by waiting for events on the listen sockets `ac
 
 The state machine is a collection of instructions that tells NGINX how to handle a request. The state machine used by most web servers that perform the same duties as NGINX is similar; the difference is in the implementation.
 
+#### Nginx Process Roles
+
+nginx runs several processes in memory; there is a single master process and several `worker` processes. There are also a couple of special purpose processes, specifically a cache loader and cache manager. All processes are single-threaded in version 1.x of nginx. All processes primarily use shared-memory mechanisms for inter-process communication. The master process is run as the `root` user. The cache loader, cache manager and `worker`s run as an unprivileged user.
+
+The master process is responsible for the following tasks:
+
+- reading and validating configuration
+- creating, binding and closing sockets
+- starting, terminating and maintaining the configured number of `worker` processes
+- reconfiguring without service interruption
+- controlling non-stop binary upgrades (starting new binary and rolling back if necessary)
+- re-opening log files
+- compiling embedded Perl scripts
+
+The `worker` processes accept, handle and process connections from clients, provide reverse proxying and filtering functionality and do almost everything else that nginx is capable of. In regards to monitoring the behavior of an nginx instance, a system administrator should keep an eye on `worker`s as they are the processes reflecting the actual day-to-day operations of a web server.
+
+The cache loader process is responsible for checking the on-disk cache items and populating nginx's in-memory database with cache metadata. Essentially, the cache loader prepares nginx instances to work with files already stored on disk in a specially allocated directory structure. It traverses the directories, checks cache content metadata, updates the relevant entries in shared memory and then exits when everything is clean and ready for use.
+
+The cache manager is mostly responsible for cache expiration and invalidation. It stays in memory during normal nginx operation and it is restarted by the master process in the case of failure.
 
 
 ##### [References]
