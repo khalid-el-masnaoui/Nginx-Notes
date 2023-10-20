@@ -2,6 +2,25 @@
 
 Notes about nginx , nginx architecture, what is and how FastCGI works and other nginx related concepts.
 
+# Table Of Contents
+
+- **[Introduction](#)**
+	-  **[What is Nginx?](#)**
+	- **[Event-Driven Architecture](#)**
+		- **[What is Event-driver Architecture?](#)**
+		- **[What is an event?](#)**
+		- **[How does event-driven architecture work?](#)**
+- **[Nginx Architecture](#)**
+	- **[Overview of nginx Architecture](#)**
+	- **[Core Structure](#)**
+	- **[Workers Model](#)**
+	- **[Nginx Process Roles](#)**
+- **[Nginx FastCGI](#)**
+	- **[FastCGI Advantages](#)**
+	- **[FastCGI Advantages](#)**
+	- **[FastCGI vs CGI Interfaces](#)**
+	- **[Example ](#)**
+
 
 ## Introduction
 
@@ -163,7 +182,7 @@ FastCGI seems like the solution for all Web server issues. However, its applicat
 - Although FastCGI supports process isolation, it does not support request isolation. FastCGI applications handle complex multiple requests simultaneously. Thus, rather than isolating the defective request, all other requests also crash.
 - Writing multiplexing FastCGI applications is complex and time-consuming.
 
-## FastCGI vs CGI Interfaces
+#### FastCGI vs CGI Interfaces
 
 The functionality provided by the FastCGI interface is very similar to that provided by CGI. To best understand the FastCGI protocol, we review the CGI interface here. Basic CGI request processing proceeds as follows:
 
