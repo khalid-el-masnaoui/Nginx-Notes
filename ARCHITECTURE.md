@@ -156,6 +156,13 @@ The FastCGI interface combines the best aspects of CGI and vendor APIs. Like CGI
 - **Architecture independence.** The FastCGI interface is not tied to a particular server architecture. Any Web server can implement the FastCGI interface. Also, FastCGI does not impose any architecture on the application: applications can be single or multi-threaded, regardless of the threading architecture of the Web server.
 - **Support for distributed computing.** FastCGI provides the ability to run applications remotely, which is useful for distributing load and managing external Web sites.
 
+**Note** :
+FastCGI seems like the solution for all Web server issues. However, its applications have disadvantages, including:
+
+- Memory leaks may occur because FastCGI applications do not terminate after each Web server request.
+- Although FastCGI supports process isolation, it does not support request isolation. FastCGI applications handle complex multiple requests simultaneously. Thus, rather than isolating the defective request, all other requests also crash.
+- Writing multiplexing FastCGI applications is complex and time-consuming.
+
 ## FastCGI vs CGI Interfaces
 
 The functionality provided by the FastCGI interface is very similar to that provided by CGI. To best understand the FastCGI protocol, we review the CGI interface here. Basic CGI request processing proceeds as follows:
