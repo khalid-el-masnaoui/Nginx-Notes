@@ -130,6 +130,21 @@ The cache loader process is responsible for checking the on-disk cache items and
 
 The cache manager is mostly responsible for cache expiration and invalidation. It stays in memory during normal nginx operation and it is restarted by the master process in the case of failure.
 
+## Nginx FastCGI
+
+#### Introduction 
+
+Nginx can proxy requests using http, FastCGI, uwsgi, SCGI, or memcached. We will discuss FastCGI proxying, which is one of the most common proxying protocols.
+
+Fast Common Gateway Interface (FastCGI) is a **standard protocol** for interfacing external applications to Web servers. It is a feature-enhanced version of the existing standard Common Gateway Interface (CGI). FastCGI remains the preferred choice over CGI and other proprietary server application programming interfaces (APIs) because its features are fast, open and maintainable.
+
+Unlike CGI, FastCGI does not create a new process for each request, thus minimizing the overhead of process creation and destruction each time a request is received. This overhead can be circumvented by using Application Program Interfaces (APIs),  but because these are proprietary, there are an additional learning curve and limitations in supported languages to be considered. Another shortcoming of CGI is the fact that certain cases for reuse can not be obtained, such as connections to databases or caching techniques. Request handling can be as much as 30 times faster using FastCGI over conventional CGI.
+
+With FastCGI, multiple requests can be handled over a single connection, which is known as multiplexing. Alternatively, multiple connections can be used. Requests are transmitted using File Transfer Protocol (FTP) or sockets. The same connection is then used to return the response.
+
+Although the connection might be closed at this point, the web server and the process still persist. This offers many advantages. For example, it means that the server and application process can be shut down or restarted separately.
+
+
 
 ##### [References]
 [https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
