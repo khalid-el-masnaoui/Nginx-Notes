@@ -196,6 +196,10 @@ One of the main use-cases of FastCGI proxying within Nginx is for PHP processing
 
 Nginx with FastCGI can be used with applications using other languages so long as there is an accessible component configured to respond to FastCGI requests.
 
+<p align="center">
+<img src="./images/fastcgi.jpg"/>
+</p>
+
 ##### [References]
 [https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
 [https://aosabook.org/en/v2/nginx.html](https://aosabook.org/en/v2/nginx.html)
