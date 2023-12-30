@@ -129,3 +129,6 @@ A few interesting default parameters to look at are the following:
 - **Repetitions -r**: This specifies the iterations to perform 
 - **Delay -d5**:  This define the delay between each user request
 - **Resource file -f**: This specifies the default configuration file (Urls file , a simple plain text file `--reps=once`) 
+
+**Note 1** : Other similar tools are `ab`(apache-benchamrk), `wrk` ...
+**Note 2** : `Siege` and `ab` are single-threaded , while `wrk` is multi-threaded
