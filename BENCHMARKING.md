@@ -90,7 +90,7 @@ Siege is an open source regression test and benchmark utility. It can stress tes
 Siege allows you to stress a web server with n number of users t number of times, where n and t are defined by the user. It records the duration time of the test as well as the duration of each single transaction. It reports the number of transactions, elapsed time, bytes transferred, response time, transaction rate, concurrency and the number of times the server responded OK, that is status code 200.
 
 By default, Siege keeps running for quite a while and prints a lot of logging information. You will be required to press Ctrl + C to close the program. The program executes the default load and prints the performance results, as shown in the following code:
-```
+```log
 Transactions: 4443 
 hits Availability: 100.00 % 
 Elapsed time: 149.94 secs 
@@ -100,7 +100,7 @@ Transaction rate: 29.63 trans/sec
 Throughput: 0.10 MB/sec 
 Concurrency: 0.05 
 Successful transactions: 4443 
-Failed transactions 0 
+Failed transactions: 0 
 Longest transaction: 0.01 
 Shortest transaction: 0.00
 
@@ -132,3 +132,62 @@ A few interesting default parameters to look at are the following:
 
 **Note 1** : Other similar tools are `ab`(apache-benchamrk), `wrk` ...
 **Note 2** : `Siege` and `ab` are single-threaded , while `wrk` is multi-threaded
+
+#### K6
+
+k6 is **a high-performing load testing tool, scriptable in JavaScript**.
+
+The k6 client command line allows you to generate many users directly from the client. This means that the k6 client acts as a controller (component orchestrating the test ) and a load generator (component sending the traffic to your application under test).
+
+The k6 solution supports out-of-the-box HTTP (1.1 and 2, grpc and WebSocket). Still, there are several extensions for MQTT, AMQP, Kafka, Mllp, Redis, generating stress on your database level and driving a headless browser.
+
+k6 can generate results like the below :
+
+```log
+scenarios: (100.00%) 1 scenario, 500 max VUs, 1m0s max duration (incl. graceful stop):
+
+* default: 500 looping VUs for 30s (gracefulStop: 30s)
+
+  
+  
+
+running (0m30.5s), 000/500 VUs, 15000 complete and 0 interrupted iterations
+
+default ✓ [======================================] 500 VUs 30s
+
+  
+
+data_received..................: 1.2 GB 39 MB/s
+
+data_sent......................: 1.2 MB 39 kB/s
+
+http_req_blocked...............: avg=492.12µs min=2.29µs med=5.64µs max=50.06ms p(90)=8.7µs p(95)=17.95µs
+
+http_req_connecting............: avg=452.39µs min=0s med=0s max=49.96ms p(90)=0s p(95)=0s
+
+http_req_duration..............: avg=10.07ms min=921.3µs med=2.93ms max=138.15ms p(90)=35.3ms p(95)=49.24ms
+
+{ expected_response:true }...: avg=10.07ms min=921.3µs med=2.93ms max=138.15ms p(90)=35.3ms p(95)=49.24ms
+
+http_req_failed................: 0.00% ✓ 0 ✗ 15000
+
+http_req_receiving.............: avg=532.76µs min=131.8µs med=495.17µs max=19.35ms p(90)=741.11µs p(95)=818.23µs
+
+http_req_sending...............: avg=113.89µs min=8.65µs med=22.06µs max=42.12ms p(90)=43.54µs p(95)=52.35µs
+
+http_req_tls_handshaking.......: avg=0s min=0s med=0s max=0s p(90)=0s p(95)=0s
+
+http_req_waiting...............: avg=9.42ms min=703.98µs med=2.32ms max=98.57ms p(90)=34.45ms p(95)=48.5ms
+
+http_reqs......................: 15000 491.048934/s
+
+iteration_duration.............: avg=1.01s min=1s med=1s max=1.15s p(90)=1.03s p(95)=1.05s
+
+iterations.....................: 15000 491.048934/s
+
+vus............................: 500 min=500 max=500
+
+vus_max........................: 500 min=500 max=500
+```
+
+You can read more about this awesome tool by reading [the official documentations](https://k6.io/docs/)
