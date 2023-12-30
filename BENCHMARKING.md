@@ -191,3 +191,6 @@ vus_max........................: 500 min=500 max=500
 ```
 
 You can read more about this awesome tool by reading [the official documentations](https://k6.io/docs/)
+
+
+**Note** : When doing performance testing with any tool, be aware of the testing the `ssl version` of your application
