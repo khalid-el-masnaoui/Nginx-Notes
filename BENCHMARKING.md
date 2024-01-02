@@ -1,11 +1,17 @@
+# Nginx Benchmarking
+
 Bench-marking the server is the process of generating metrics of the throughput, responsiveness and reliability of the application response. This is the precursor to server optimization since the generated metrics serve as as a **_baseline_** that can be used to know the effectiveness of any optimization done.
 
 
 # Table Of Contents
-- **[section1](#section1)**
--  **[section1](#section1)**
-	-  **[section1](#section1)**
-	-  **[section1](#section1)**
+- **[Performance testing](#performance-testing)**
+	- **[Introduction](#introduction)**
+	- **[Timeouts](#timeouts)**
+	- **[Baselines](#baselines)**
+-  **[Generating metrics with Tools](#generating-metrics-with-tools)**
+	-  **[Siege](#siege)**
+	-  **[K6](#k6)**
+	- **[Visualizing Results](#visualizing-results)**
 
 
 ## Performance testing
@@ -83,7 +89,7 @@ A baseline is defined as the accepted attributes that describe a system at a par
 
 There are many tools for load testing your application.
 
-#### siege 
+#### Siege 
 
 Siege is an open source regression test and benchmark utility. It can stress test a single URL with a user defined number of simulated users, or it can read many URLs into memory and stress them simultaneously.
 
