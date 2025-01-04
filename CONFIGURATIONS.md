@@ -1,3 +1,49 @@
+# Nginx Configurations
+
+## Overview
+
+All you need for Configuring Nginx in one place.
+
+
+# Table Of Contents
+- **[Configuration Directory Structure](#configuration-directory-structure)**
+    - **[sites-available](#sites-available)**
+    - **[sites-enabled](#sites-enabled)**
+    - **[snippets](#snippets)**
+        - **[directive](#directive)**
+        - **[location](#location)**
+    - **[ssl](#ssl)**
+    - **[nginx.conf](#nginxconf)**
+- **[Basic Configurations](#basic-configurations)**
+    - **[`listen`](#the-listen-directive)**
+    - **[`server_name`](#the-server_name-directive)**
+    - **[Redirect to non-www server name](#redirect-to-non-www-server-name)**
+    - **[`root`](#the-root-directive)**
+    - **[`index`](#the-index-directive)**
+    - **[`try_files`](#the-try_files-directive)**
+    - **[`error_page`](#the-error_page-directive)**
+    - **[`error_log`](#the-error_log-directive)**
+    - **[`access_log`](#the-access_log-directive)**
+- **[Drop Request to an Unknown Server Name](#drop-request-to-an-unknown-server-name)**
+- **[Setup New Website](#setup-new-website)**
+- **[Setup PHP Website](#setup-php-website)**
+- **[Setup Reverse Proxy](#setup-reverse-proxy)**
+- **[Free SSL Certificate with Let's Encrypt](#free-ssl-certificate-with-lets-encrypt)**
+    - **[Certbot Installation](#certbot-installation)**
+    - **[Get SSL Certificate](#get-ssl-certificate)**
+- **[Setup SSL Website](#setup-ssl-website)**
+- **[Advanced Configurations](#advanced-configurations)**
+    - **[`user`](#the-user-directive)**
+    - **[`worker_processes`](#the-worker_processes-directive)**
+    - **[`worker_rlimit_nofile`](#the-worker_rlimit_nofile-directive)**
+    - **[`worker_connections`](#the-worker_connections-directive)**
+    - **[`server_names_hash_max_size`](#the-server_names_hash_max_size-and-server_names_hash_bucket_size-directives)** and **[`server_names_hash_bucket_size`](#the-server_names_hash_max_size-and-server_names_hash_bucket_size-directives)**
+    - **[`types_hash_max_size`](#the-types_hash_max_size-and-types_hash_bucket_size-directives)** and **[`types_hash_bucket_size`](#the-types_hash_max_size-and-types_hash_bucket_size-directives)**
+    - **[`sendfile`](#the-sendfile-directive)**
+    - **[`tcp_nopush`](#the-tcp_nopush-directive)**
+    - **[`tcp_nodelay`](#the-tcp_nodelay-directive)**
+    - **[`keepalive_timeout`](#the-keepalive_timeout-directive)**
+    - **[Gzip related directives](#gzip-related-directives)**
 ## Configuration Directory Structure
 
 Here's an overview of this Nginx configuration directory structure:
