@@ -7,15 +7,15 @@ These list of Nginx commands should help you better understand and manage Nginx 
 
 # Table Of Contents
 
-**[Starting and Stopping Nginx](#starting-and-stopping-nginx)**
-	- **[Start Nginx](#start-nginx)**
+- **[Starting and Stopping Nginx](#starting-and-stopping-nginx)**
+	-  **[Start Nginx](#start-nginx)**
 	- **[Stop Nginx](#stop-nginx)**
 	- **[Restart Nginx](#restart-nginx)**
 	- **[Reload Nginx](#reload-nginx)**
 	- **[Quit Nginx](#quit-nginx)**
 	- **[Check Nginx status](#check-nginx-status)**
 
-**[Configuration Management](#configuration-management)**
+- **[Configuration Management](#configuration-management)**
 	- **[Reload Nginx configuration](#reload-nginx-configuration)**
 	- **[Test Nginx configuration for syntax errors](#test-nginx-configuration-for-syntax-errors)**
 	- **[Start Nginx with a custom configuration file](#start-nginx-with-a-custom-configuration-file)**
@@ -23,25 +23,24 @@ These list of Nginx commands should help you better understand and manage Nginx 
 	- **[Start Nginx with a custom global configuration prefix](#start-nginx-with-a-custom-global-configuration-prefix)**
 	- **[Set a custom worker process count](#set-a-custom-worker-process-count)**
 
-**[Logging and Monitoring](#logging-and-monitoring)**
+- **[Logging and Monitoring](#logging-and-monitoring)**
 	- **[View Nginx error logs](#view-nginx-error-logs)**
 	- **[View Nginx access logs](#view-nginx-access-logs)**
 	- **[Display active Nginx connections](#display-active-nginx-connections)**
 
-[Process Management](#process-management)
+- **[Process Management](#process-management)**
 	- **[Display Nginx process ID (PID)](#display-nginx-process-id-pid)**
 	- **[Send a signal to a specific Nginx process](#send-a-signal-to-a-specific-nginx-process)**
 
-**[Boot Configuration](#boot-configuration)**
+- **[Boot Configuration](#boot-configuration)**
 	- **[Enable Nginx auto-start at boot](#enable-nginx-auto-start-at-boot)**
 	- **[Disable Nginx auto-start at boot](#disable-nginx-auto-start-at-boot)**
 
-**[Help and Version Information](#help-and-version-information)**
+- **[Help and Version Information](#help-and-version-information)**
 	- **[Display Nginx version and configuration options](#display-nginx-version-and-configuration-options)**
 	- **[Display help information](#display-help-information)**
 
-
-**[Configuration File Management](#configuration-file-management)**
+- **[Configuration File Management](#configuration-file-management)**
 	- **[Create a temporary backup of the Nginx configuration](#create-a-temporary-backup-of-the-nginx-configuration)**
 	- **[Restore a backup of the Nginx configuration](#restore-a-backup-of-the-nginx-configuration)**
 	- **[Open the main Nginx configuration file with a text editor](#open-the-main-nginx-configuration-file-with-a-text-editor)**
@@ -66,6 +65,7 @@ sudo systemctl start nginx
 ```
 
 ### Stop Nginx
+SIGTERM Signal
 
 Stopping Nginx will kill all system processes quickly. This will terminate Nginx even if there are open connections. 
 In order to do so, run one of the following commands:
@@ -93,6 +93,7 @@ sudo systemctl restart nginx
 ```
 
 ### Reload Nginx
+SIGHUP signal
 
 ```
 sudo nginx -s reload
@@ -105,6 +106,7 @@ sudo systemctl reload nginx
 ```
 
 ### Quit Nginx
+SIGQUIT signal
 
 ```
 sudo nginx -s quit
