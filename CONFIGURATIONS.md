@@ -36,7 +36,7 @@ All you need for Configuring Nginx in one place.
     - **[`user`](#the-user-directive)**
     - **[`worker_processes`](#the-worker_processes-directive)**
     - **[`worker_rlimit_nofile`](#the-worker_rlimit_nofile-directive)**
-    - **[`worker_connections`](#the-worker_connections-directive)**
+    - **[`multi_accept`](#the-multi-accept-and-worker_connections-directives)** and **[`worker_connections`](#the-multi-accept-and-worker_connections-directives)**
     - **[`server_names_hash_max_size`](#the-server_names_hash_max_size-and-server_names_hash_bucket_size-directives)** and **[`server_names_hash_bucket_size`](#the-server_names_hash_max_size-and-server_names_hash_bucket_size-directives)**
     - **[`types_hash_max_size`](#the-types_hash_max_size-and-types_hash_bucket_size-directives)** and **[`types_hash_bucket_size`](#the-types_hash_max_size-and-types_hash_bucket_size-directives)**
     - **[`sendfile`](#the-sendfile-directive)**
@@ -637,11 +637,16 @@ Use this directive to set the maximum number of open files (the `RLIMIT_NOFILE`)
 worker_rlimit_nofile 8192;
 ```
 
-### The `worker_connections` directive
-This directive sets the maximum number of simultaneous connections that can be opened by the worker processes. Note that this is not only connections with clients but also any other internal connections (e.g. connections with the proxy server).
+### The `multi_accept` and `worker_connections` directives
+
+If `multi_accept` is disabled, a worker process will accept one new connection at a time. Otherwise, a worker process will accept all new connections at a time.
+It enables an NGINX worker to accept as many connections as possible when it gets the notification of a new connection. The purpose of this flag is to accept all connections in the listen queue at once. If the directive is disabled, a worker process will accept connections one by one
+
+`worker_connections` directive sets the maximum number of simultaneous connections that can be opened by the worker processes. Note that this is not only connections with clients but also any other internal connections (e.g. connections with the proxy server).
 
 ```nginx
 events {
+	multi_accept on;
     worker_connections 8000;
 }
 ```
