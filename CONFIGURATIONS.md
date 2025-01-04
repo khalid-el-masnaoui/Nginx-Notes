@@ -4,10 +4,9 @@ Here's an overview of this Nginx configuration directory structure:
 
 ```
 Configuration
-|-- sites-available         # Your available website configurations
 |-- sites-enabled           # Your enabled website configurations
-|-- sites-example           # Website configuration examples
-|   |-- no-default.conf
+|-- sites-available         # Your available website configurations
+|   |-- default.conf
 |   |-- site.conf
 |   |-- site-ssl.conf
 |   |-- php.conf
@@ -21,28 +20,19 @@ Configuration
 |-- nginx.conf              # Main configurations
 ```
 
-### conf.d
-All of your custom Nginx configurations should be defined here. If you check the `nginx.conf` file, you'll see that all of the files with `.conf` extension within this directory will be included.
-
-### logs
-By default, this is where all of the Nginx error & access log files will be stored.
-
 ### sites-available
-This is where you'll store your website configuration files. Note that configuration files stored here are not automatically available to Nginx, you still have to create a symbolic link within the `sites-enabled` directory.
+This is where you'll store your website configuration files. Note that configuration files stored here are not automatically available to Nginx, you still have to create a symbolic link within the `sites-enabled` directory.  There are 7 configuration examples included:
 
-### sites-enabled
-This directory holds all of the enabled website configurations. Usually, this directory only contains symbolic links to the actual configuration files in `sites-available` directory.
-
-### sites-example
-This is where all of the website configuration examples that you can easily copy are stored. Currently, there are 7 configuration examples that you can use:
-
-* `no-default.conf` => To drop request to an unknown server name
+* `default.conf` => To drop request to an unknown server name
 * `site.conf` => Basic website configuration
 * `site-ssl.conf` => Basic website configuration with SSL
 * `php.conf` => PHP based website configuration
 * `php-ssl.conf` => PHP based website configuration with SSL
 * `proxy.conf` => Reverse proxy configuration
 * `proxy-ssl.conf` => Reverse proxy configuration with SSL
+
+### sites-enabled
+This directory holds all of the enabled website configurations. Usually, this directory only contains symbolic links to the actual configuration files in `sites-available` directory.
 
 ### snippets
 This is where you'll find all of the reusable Nginx configuration snippets are. You'll see that some of these snippets are being included on the website configuration examples. There are two directories within it:
@@ -112,7 +102,7 @@ server {
 ```
 
 ### Redirect to non-www server name
-As you might have noticed, the first `server` block on all of the website configuration examples are dealing with a redirection from a www version to the non-www version (e.g. from www.example.com to example.com).
+As you might have noticed, the first `server` block on all of the website configuration examples are dealing with a redirection from a www version to the non-www version (e.g. from www.malidkha.com to malidkha.com).
 
 ```nginx
 server {
@@ -181,16 +171,10 @@ access_log /etc/nginx/logs/malidkha.com_access.log main;
 
 If a client requests for an unknown server name and there's no default server name defined, by default Nginx will serve the first server configuration found. To prevent this, you have to create a configuration for a default server name where you'll drop the request.
 
-First, copy the `no-default.conf` example:
+First, create a symbolic link to this configuration file within the `sites-enabled` directory:
 
 ```bash
-sudo cp /etc/nginx/sites-example/no-default.conf /etc/nginx/sites-available/no-default
-```
-
-Secondly, create a symbolic link to this configuration file within the `sites-enabled` directory:
-
-```bash
-sudo ln -sfv /etc/nginx/sites-available/no-default /etc/nginx/sites-enabled/
+sudo ln -sfv /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/
 ```
 
 Make sure that there's no error on the configuration file:
@@ -206,22 +190,18 @@ sudo service nginx reload
 
 ## Setup New Website
 
-This section will guide you to set up new static files based website (HTML/CSS/JS) using the available `site.conf` example. Suppose you've put your website project on `/var/www/awesome.com` directory and will serve all of the static files from `/var/www/awesome.com/public` directory.
+This section will guide you to set up new static files based website (HTML/CSS/JS) using the available `site.conf` example. Suppose you've put your website project on `/var/www/html/site.com` directory and will serve all of the static files from `/var/www/html/site.com/public` directory.
 
-You've also got the `awesome.com` domain name setup where this website will be served. First, you need to copy the `site.conf` configuration example to `sites-available`:
+You've also got the `site.com` domain name setup where this website will be served. :
 
-```bash
-sudo cp /etc/nginx/sites-example/site.conf /etc/nginx/sites-available/awesome.com
-```
-
-Then open up the copied file with your favorite editor:
+ First, open up the copied file with your favorite editor:
 
 ```bash
 # Open it up in VIM
-sudo vim /etc/nginx/sites-available/awesome.com
+sudo vim /etc/nginx/sites-available/site.conf
 ```
 
-Replace all of the references to `example.com` with your `awesome.com` domain:
+Replace all of the references to `malidkha.com` with your `site.com` domain:
 
 ```nginx
 # For brevity only show the lines that need to be changed.
@@ -230,26 +210,26 @@ server {
     ...
 
     # The www host server name.
-    server_name www.awesome.com;
+    server_name www.site.com;
 
     # Redirect to the non-www version.
-    return 301 $scheme://awesome.com$request_uri;
+    return 301 $scheme://site.com$request_uri;
 }
 
 server {
     ...
 
     # The non-www host server name.
-    server_name awesome.com;
+    server_name site.com;
 
     # The document root path.
-    root /var/www/awesome.com
+    root /var/www/html/site.com
 
     ...
 
     # Log configuration.
-    error_log /etc/nginx/logs/awesome.com_error.log error;
-    access_log /etc/nginx/logs/awesome.com_access.log main;
+    error_log /var/log/nginx/logs/site.com_error.log error;
+    access_log /var/log/nginx/logs/site.com_access.log main;
 
     ...
 }
@@ -258,7 +238,7 @@ server {
 Next, you need to create a symbolic link within the `sites-enabled` directory that points out to this configuration file:
 
 ```bash
-sudo ln -sfv /etc/sites-available/awesome.com /etc/sites-enabled/
+sudo ln -sfv /etc/sites-available/site.conf /etc/sites-enabled/
 ```
 
 Make sure that there are no errors on the new configuration file:
@@ -273,26 +253,22 @@ Lastly reload your Nginx configuration with the following command:
 sudo service nginx reload
 ```
 
-That's it, your website should now be served under the `awesome.com` domain.
+That's it, your website should now be served under the `site.com` domain.
 
 ## Setup PHP Website
 
 To set up a new PHP based website, the steps are quite similar to [Setup New Website](#setup-new-website) section. But instead of `site.conf`, you'll be using the `php.conf` example file as a base.
 
-Suppose you already set up a domain named `awesome.com` and you'll serve any incoming request from this root directory: `/var/www/awesome.com/public`. Copy the `php.conf` file first:
+Suppose you already set up a domain named `php-site.com` and you'll serve any incoming request from this root directory: `/var/www/html/php-site.com/public`. 
 
-```bash
-sudo cp /etc/nginx/sites-example/php.conf /etc/nginx/sites-available/awesome.com
-```
-
-Then open it up with your favorite editor:
+First, open it up with your favorite editor:
 
 ```bash
 # Open it up in VIM
-sudo vim /etc/nginx/sites-available/awesome.com
+sudo vim /etc/nginx/sites-available/php.conf
 ```
 
-Replace all of the references to `example.com` with your `awesome.com` domain.
+Replace all of the references to `malidkha.com` with your `php-site.com` domain.
 
 ```nginx
 # For brevity only show the lines that need to be changed.
@@ -301,20 +277,20 @@ server {
     ...
 
     # The www host server name.
-    server_name www.awesome.com;
+    server_name www.php-site.com;
 
     # Redirect to the non-www version.
-    return 301 $scheme://awesome.com$request_uri;
+    return 301 $scheme://php-site.com$request_uri;
 }
 
 server {
     ...
 
     # The non-www host server name.
-    server_name awesome.com;
+    server_name php-site.com;
 
     # The document root path.
-    root /var/www/awesome.com/public;
+    root /var/www/html/php-site.com/public;
 
     ...
 
@@ -323,7 +299,7 @@ server {
         include snippets/directive/fastcgi-php.conf;
 
         # With php-fpm or other unix sockets.
-        fastcgi_pass unix:/run/php/php7.1-fpm.sock;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
 
         # With php-cgi or other tcp sockets).
         # fastcgi_pass 127.0.0.1:9000;
@@ -332,20 +308,20 @@ server {
     ...
 
     # Log configuration.
-    error_log /etc/nginx/logs/awesome.com_error.log error;
-    access_log /etc/nginx/logs/awesome.com_access.log main;
+    error_log /var/log/nginx/logs/php-site.com_error.log error;
+    access_log /var/log/nginx/logs/php-site.com_access.log main;
 
     ...
 }
 ```
 
-You also need to set up the FastCGI address correctly with `fastcgi_pass` directive. Suppose you'll use the PHP-FPM as the gateway and connect it through Unix socket in `/run/php/php7.1-fpm.sock`:
+You also need to set up the FastCGI address correctly with `fastcgi_pass` directive. Suppose you'll use the PHP-FPM as the gateway and connect it through Unix socket in `/run/php/php8.1-fpm.sock`:
 
 ```nginx
 location ~ \.php$ {
     include snippets/directive/fastcgi-php.conf;
 
-    fastcgi_pass unix:/run/php/php7.1-fpm.sock;
+    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
 
     # Or if you happen to connect it through TCP port.
     # fastcgi_pass 127.0.0.1:9000;
@@ -355,7 +331,7 @@ location ~ \.php$ {
 Next, create a symbolic link to this file within the `sites-enabled` directory:
 
 ```bash
-sudo ln -sfv /etc/nginx/sites-available/awesome.com /etc/nginx/sites-enabled/
+sudo ln -sfv /etc/nginx/sites-available/php.con /etc/nginx/sites-enabled/
 ```
 
 Test your new configuration file and make sure that there are no errors:
@@ -374,20 +350,16 @@ sudo service nginx reload
 
 You can use the `proxy.conf` example file as a base to create a reverse proxy site configuration. For example, if you have a Node.JS application running locally on port `3000`, you can expose it to the internet through a reverse proxy.
 
-Suppose you've set up a domain named `awesome.com` to use. First, you need to copy the `proxy.conf` file to the `sites-available` directory:
+Suppose you've set up a domain named `proxy-site.com` to use. 
 
-```bash
-sudo cp /etc/nginx/sites-example/proxy.conf /etc/nginx/sites-available/awesome.com
-```
-
-Open the copied file with your favorite editor:
+First, open the copied file with your favorite editor:
 
 ```bash
 # Open it up in VIM
-sudo vim /etc/nginx/sites-available/awesome.com
+sudo vim /etc/nginx/sites-available/proxy.conf
 ```
 
-Then replace all of the references to `example.com` with your `awesome.com` domain:
+Then replace all of the references to `malidkha.com` with your `proxy-site.com` domain:
 
 ```nginx
 # For brevity only show the lines that need to be changed.
@@ -401,26 +373,26 @@ server {
     ...
 
     # The www host server name.
-    server_name www.awesome.com;
+    server_name www.proxy-site.com;
 
     # Redirect to the non-www version.
-    return 301 $scheme://awesome.com$request_uri;
+    return 301 $scheme://proxy-site.com$request_uri;
 }
 
 server {
     ...
 
     # The non-www host server name.
-    server_name awesome.com;
+    server_name proxy-site.com;
 
     # The document root path.
-    root /var/www/awesome.com/public;
+    root /var/www/html/proxy-site.com/public;
 
     ...
 
     # Log configuration.
-    error_log /etc/nginx/logs/awesome.com_error.log error;
-    access_log /etc/nginx/logs/awesome.com_access.log main;
+    error_log /var/log/nginx/logs/proxy-site.com_error.log error;
+    access_log /var/log/nginx/logs/proxy-site.com_access.log main;
 
     ...
 }
@@ -442,7 +414,7 @@ Since the Nginx is really good at serving static files, the example configuratio
 server {
     ...
 
-    root /var/www/example.com/public;
+    root /var/www/html/proxy-site.com/public;
 
     location / {
         # First attempt to serve request as a file, then proxy it to the
@@ -457,7 +429,7 @@ server {
 The next step would be to create a symbolic link within the `sites-enabled` that refers to this config file:
 
 ```bash
-sudo ln -sfv /etc/nginx/sites-available/awesome.com /etc/nginx/sites-enabled/
+sudo ln -sfv /etc/nginx/sites-available/proxy.conf /etc/nginx/sites-enabled/
 ```
 
 Test your new configuration file and make sure that there are no errors:
