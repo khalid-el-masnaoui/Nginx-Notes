@@ -49,8 +49,8 @@ This directory holds all of the snippets that contain only a directive configura
 #### location
 This is where all of the snippets with configuration directives being set within the `location` block goes.
 
-* `cache-control.conf` => The `Cahce-Control` header configuration for some static files
-* `protect-sensitive-files.conf` => Protection for sensitive files
+* `cache-control.conf` =>The cache and compression configurations for some static files
+* `security.conf` => Some security and protection for sensitive files
 
 > Note that the `add_header` directive set on the `location` block will replace the other `add_header` directives that are being set on its parent block or any less specific `location` block.
 
@@ -122,7 +122,7 @@ server {
 This is where you set the root directory for requests.
 
 ```nginx
-root /var/www/malidkha.com/public;
+root /var/www/html/malidkha.com/public;
 ```
 
 ### The `index` directive
@@ -155,14 +155,14 @@ error_page 404 /404.html;
 This directive allows you to set the path to the log file. You can also set the log level to any of the following options: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, or `emerg`.
 
 ```nginx
-error_log /etc/nginx/logs/malidkha.com_error.log error;
+error_log /var/log/nginx/malidkha.com_error.log error;
 ```
 
 ### The `access_log` directive
 This is where you set the path to the request log file. For performance reason, you can also set this directive `off` to disable the request log.
 
 ```nginx
-access_log /etc/nginx/logs/malidkha.com_access.log main;
+access_log /var/log/nginx/malidkha.com_access.log main;
 ```
 
 `main` is referring to the access log format defined on `nginx.conf` file.
@@ -228,8 +228,8 @@ server {
     ...
 
     # Log configuration.
-    error_log /var/log/nginx/logs/site.com_error.log error;
-    access_log /var/log/nginx/logs/site.com_access.log main;
+    error_log /var/log/nginx/site.com_error.log error;
+    access_log /var/log/nginx/site.com_access.log main;
 
     ...
 }
@@ -259,7 +259,7 @@ That's it, your website should now be served under the `site.com` domain.
 
 To set up a new PHP based website, the steps are quite similar to [Setup New Website](#setup-new-website) section. But instead of `site.conf`, you'll be using the `php.conf` example file as a base.
 
-Suppose you already set up a domain named `php-site.com` and you'll serve any incoming request from this root directory: `/var/www/html/php-site.com/public`. 
+Suppose you already set up a domain named `php-site.com` and you'll serve any incoming request from this root directory: `/var/www/html/site.com/public`. 
 
 First, open it up with your favorite editor:
 
@@ -277,20 +277,20 @@ server {
     ...
 
     # The www host server name.
-    server_name www.php-site.com;
+    server_name www.site.com;
 
     # Redirect to the non-www version.
-    return 301 $scheme://php-site.com$request_uri;
+    return 301 $scheme://site.com$request_uri;
 }
 
 server {
     ...
 
     # The non-www host server name.
-    server_name php-site.com;
+    server_name site.com;
 
     # The document root path.
-    root /var/www/html/php-site.com/public;
+    root /var/www/html/site.com/public;
 
     ...
 
@@ -308,8 +308,8 @@ server {
     ...
 
     # Log configuration.
-    error_log /var/log/nginx/logs/php-site.com_error.log error;
-    access_log /var/log/nginx/logs/php-site.com_access.log main;
+    error_log /var/log/nginx/site.com_error.log error;
+    access_log /var/log/nginx/site.com_access.log main;
 
     ...
 }
@@ -331,7 +331,7 @@ location ~ \.php$ {
 Next, create a symbolic link to this file within the `sites-enabled` directory:
 
 ```bash
-sudo ln -sfv /etc/nginx/sites-available/php.con /etc/nginx/sites-enabled/
+sudo ln -sfv /etc/nginx/sites-available/php.conf /etc/nginx/sites-enabled/
 ```
 
 Test your new configuration file and make sure that there are no errors:
@@ -373,26 +373,26 @@ server {
     ...
 
     # The www host server name.
-    server_name www.proxy-site.com;
+    server_name www.site.com;
 
     # Redirect to the non-www version.
-    return 301 $scheme://proxy-site.com$request_uri;
+    return 301 $scheme://site.com$request_uri;
 }
 
 server {
     ...
 
     # The non-www host server name.
-    server_name proxy-site.com;
+    server_name site.com;
 
     # The document root path.
-    root /var/www/html/proxy-site.com/public;
+    root /var/www/html/site.com/public;
 
     ...
 
     # Log configuration.
-    error_log /var/log/nginx/logs/proxy-site.com_error.log error;
-    access_log /var/log/nginx/logs/proxy-site.com_access.log main;
+    error_log /var/log/nginx/site.com_error.log error;
+    access_log /var/log/nginx/site.com_access.log main;
 
     ...
 }
@@ -414,7 +414,7 @@ Since the Nginx is really good at serving static files, the example configuratio
 server {
     ...
 
-    root /var/www/html/proxy-site.com/public;
+    root /var/www/html/site.com/public;
 
     location / {
         # First attempt to serve request as a file, then proxy it to the
@@ -465,15 +465,15 @@ sudo apt-get install -y python-certbot-nginx
 
 ### Get SSL Certificate
 
-Suppose you want to generate an SSL certificate for your `awesome.com` and `www.awesome.com` domains. The first thing you need to do is to set up the non-SSL version of your website. You can refer to the [Setup New Website](#setup-new-website) section for this. 
+Suppose you want to generate an SSL certificate for your `site.com` and `www.site.com` domains. The first thing you need to do is to set up the non-SSL version of your website. You can refer to the [Setup New Website](#setup-new-website) section for this. 
 
-Note that within your website configuration you need to include the `snippets/basic.conf` or `snippets/location/protect-sensitive-files.conf` snippets. This snippet will allow client to access the `.well-known` directory thus allowing the `certbot` client verifying our domain.
+Note that within your website configuration you need to include the `snippets/basic.conf` or `snippets/location/security.conf` snippets. This snippet will allow client to access the `.well-known` directory thus allowing the `certbot` client verifying our domain.
 
 ```nginx
 server {
     listen 80;
     listen [::]:80;
-    server_name awesome.com;
+    server_name site.com;
     ...
 
     # Include basic configuration.
@@ -490,17 +490,19 @@ sudo certbot --nginx certonly
 Just follow the instruction, the `certbot` will guide you. Or if you want to automate it and be done with just one single command, you can do this:
 
 ```bash
-sudo certbot certonly --webroot -w /var/www/awesome.com/public -d awesome.com -d www.awesome.com -n -m johndoe@awesome.com --agree-tos
+sudo certbot certonly --nginx -w /var/www/_letsencrypt -d site.com -d www.site.com -n -m malidkha-example@gmail.com --agree-tos --force-renewal
 ```
 
-* `--webroot` => Use the webroot plugin
-* `-w` => The root directory of your website
+* `--nginx` => Use the nginx plugin
+* `-w` => The root directory of your letsencrypt
 * `-d` => The domain name of your website
 * `-n` => Use the non-interactive mode
 * `-m` => Email address for notification
 * `--agree-tos` => Agree to TOS
+* `--dry-run` => dry run the certificates 
+* `--force-renewal`=> automatically renew the certificates before 30 days of expiration
 
-The `certbot` will generate the SSL certificate under the `/etc/letsencrypt/live/awesome.com`. There will be four types of files available to you:
+The `certbot` will generate the SSL certificate under the `/etc/letsencrypt/live/site.com`. There will be four types of files available to you:
 
 * `fullchain.pem` => Contain all of the certificates (server certificate and follow by any other intermediates)
 * `privkey.pem` => The private key for your certificate
@@ -509,15 +511,21 @@ The `certbot` will generate the SSL certificate under the `/etc/letsencrypt/live
 
 And that's it, you've just got yourself your own SSL certificate ready to use for your website.
 
+**Note** : 
+`certbot certificates` ==> list all certificates and their expirations dates
+When ssl certificate is renewed , we need to reload nginx. We can instruct lestencrypt to do so with:
+- echo -e '#!/bin/bash\nginx -t && systemctl reload nginx' | sudo tee /etc/letsencrypt/renewal-hooks/post/nginx-reload.sh
+- sudo chmod a+x /etc/letsencrypt/renewal-hooks/post/nginx-reload.sh
+
 ## Setup SSL Website
 
-Before setting up a new SSL website, you need to generate strong DH parameters for the DHE ciphers and store it within the `ssl` directory:
+Before setting up a new SSL website, you need to generate strong DH parameters for the DHE ciphers:
 
 ```bash
 sudo openssl dhparam -out /etc/nginx/ssl/dhparam.pem 4096
 ```
 
-Within the `sites-example` directory there is an SSL version for each of the website configuration type:
+Within the `sites-available` directory there is an SSL version for each of the website configuration type:
 
 - `site-ssl.conf` => For static files based website (HTML/JS/CSS)
 - `php-ssl.conf` => For PHP based website
@@ -527,19 +535,19 @@ To set up the SSL version, the steps are quite similar to the non-SSL version ex
 
 ```nginx
 # SSL certificate file.
-ssl_certificate ssl/awesome.com/fullchain.pem;
+ssl_certificate ssl/site.com/fullchain.pem;
 
 # SSL certificate secret key file.
-ssl_certificate_key ssl/awesome.com/privkey.pem;
+ssl_certificate_key ssl/site.com/privkey.pem;
 
 # SSL trusted CA certificate file for OCSP stapling.
-ssl_trusted_certificate ssl/awesome.com/chain.pem;
+ssl_trusted_certificate ssl/site.com/chain.pem;
 ```
 
-You can just drop your SSL certificate files under the `/etc/nginx/ssl/awesome.com` directory or create a symlink that points to the real path. Or if you happen to use the Let's Encrypt certificate from the previous section, you create it like so:
+You can just drop your SSL certificate files under the `/etc/nginx/ssl/site.com` directory or create a symlink that points to the real path. Or if you happen to use the Let's Encrypt certificate from the previous section, you create it like so:
 
 ```bash
-sudo ln -sfv /etc/letsencrypt/live/awesome.com /etc/nginx/ssl/
+sudo ln -sfv /etc/letsencrypt/live/site.com /etc/nginx/ssl/
 ```
 
 Once everything is set up, don't forget to test your configuration file first:
