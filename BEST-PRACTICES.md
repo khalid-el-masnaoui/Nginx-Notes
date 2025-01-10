@@ -160,3 +160,53 @@ Ensure that the Nginx installation directory and configuration files are accessi
   [root@localhost ~]# chown root:root -R /etc/nginx
   [root@localhost ~]# chmod o-rwx -R /etc/nginx
   ```
+
+## Disabling Unused HTTP Methods
+When unused HTTP methods are enabled on a web service, they can expose vulnerabilities or unintended behaviors that may lead to abuse and become an attack vector. 
+
+It is important to disable any methods that are not in use, particularly the `TRACE` method, which is used for debugging and is generally unnecessary for normal web service operations.
+
+**HTTP Methods:**
+
+| Name    | Description                                                                                                                                         |
+|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| OPTIONS | 	Used to check the list of supported methods by the web server.                                                                                     |
+| HEAD    | 	The server sends only the header information in the response. It is often used to check the existence of a page by receiving the HTTP status code. |
+| GET     | 	Similar to POST, but does not handle form input; typically used to retrieve information such as lists in forums via URI transmission.              |
+| POST    | 	Used when sending data from a client to a web application for processing.                                                                          |
+| PUT     | 	Similar to POST, used to save content specified by the client to the server.                                                                       |
+| DELETE  | 	Used by the client to delete files on the server.                                                                                                  |
+| TRACE   | 	Used to invoke a loopback message on the web server to trace the data transmission path.                                                           |
+| CONNECT | 	Used to request proxy functionality from the web server.                                                                                           |
+
+**Audit:**
+- Verify that which HTTP methods are available on your web server:
+  ```
+  [root@localhost ~]# curl -i -k -X OPTIONS http://example.com
+  HTTP/1.1 200 OK
+  Server: nginx
+  Date: Mon, 12 Aug 2024 03:00:29 GMT
+  Content-Type: text/html; charset=utf-8
+  Content-Length: 0
+  Connection: keep-alive
+  Allow: GET, HEAD, OPTIONS, PUT, DELETE, POST, PATCH
+  ...
+  ```
+
+**Remediation:**
+- Disable TRACE Method
+- Enable Only Necessary HTTP Methods:
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+  
+  server {
+      ...
+      # Allow only specified methods (e.g., HEAD, GET, POST)
+      if ($request_method !~ ^(HEAD|GET|POST)$ ){
+              return 403;
+        }
+  }
+  ...
+  ```
+***Note: The $request_method directive can be applied at the server or location block level as needed.***
