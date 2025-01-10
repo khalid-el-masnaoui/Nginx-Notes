@@ -73,3 +73,24 @@ It is important to ensure that Nginx is not running under a privileged account, 
   [root@localhost ~]# passwd -S nginx
   nginx LK 2023-10-16 -1 -1 -1 -1 (Password locked.)
   ```
+
+## Ensure Nginx Version Information is Not Exposed
+By default, Nginx HTTP Server displays the version information in the HTTP response header. This can provide attackers with insights into potential vulnerabilities. Hiding the version information mitigates this risk.
+
+**Audit:**
+- Verify that Nginx version information is exposed in the HTTP response header:
+  ```bash
+  [root@localhost ~]# curl -i -k http://127.0.0.1
+  HTTP/1.1 200
+  Server: nginx/1.26.1
+  ...
+  ```
+**Remediation:**
+- To prevent the version information from being exposed, modify the following settings in the Nginx configuration:
+  ```bash
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  http {
+        ...
+        server_tokens off;  # <== Set to hide version information
+        ...
+  ```
