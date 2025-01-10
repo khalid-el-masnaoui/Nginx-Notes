@@ -557,3 +557,80 @@ Rate limiting per IP address in Nginx helps maintain stable web services by cont
 - Rate limits help maintain consistent performance by preventing abuse while accommodating occasional bursts of traffic.
 
 By implementing IP-based rate limits, you can protect your server from misuse and ensure a reliable experience for legitimate users.
+
+
+## Inspect and Control Request Headers
+Web servers can inspect and control HTTP request headers to determine the presence or value of specific headers. This capability enables conditional access, such as blocking specific clients or permitting predefined user agents (e.g., mobile apps). It is commonly applied for:
+
+- Blocking known attack tools or abusive scanning software.
+- Allowing access only to predefined clients or bots.
+- Securing APIs by validating authorization headers.
+
+**Audit:**
+- Verifying Header Restrictions is applied
+  - Review the Nginx configuration for if directives that check headers like User-Agent or Authorization.
+  - Check server logs for unauthorized requests and verify appropriate error responses are sent.
+
+
+**Remediation:**
+- Configuring Header Restrictions
+
+(1) Block Known Vulnerability Scanners
+- Example configuration to block common web vulnerability scanning tools:
+  ```nginx
+  server {
+      listen 443 ssl;
+      server_name download.example.com;
+  
+      # Block requests with known attack tool User-Agent strings
+      if ($http_user_agent ~* "Paros|ZmEu|nikto|dirbuster|sqlmap|openvas|w3af|Morfeus|Zollard|Arachni|Brutus|bsqlbf|Grendel-Scan|Havij|Hydra|N-Stealth|Netsparker|Pangolin|pmafind|webinspect") {
+          return 404;  # Return HTTP 404 Not Found
+      }
+  }
+  ```
+
+(2) Restrict Specific Headers for Certain URLs
+- Example to enforce valid authorization headers for API access:
+  ```nginx
+  server {
+      listen 443 ssl;
+      server_name download.example.com;
+  
+      location /api {
+          proxy_http_version 1.1;
+  
+          # Only allow requests with Authorization header starting with "Bearer"
+          if ($http_authorization !~ "^Bearer") {
+              return 401;  # Return HTTP 401 Unauthorized
+          }
+  
+          proxy_pass http://app:3000/;
+      }
+  }
+  ```
+
+(3) Allow Only Specific Clients
+- Example to permit access to predefined User-Agent strings:
+  ```nginx
+  http {
+      if ($http_user_agent !~ "Agent.MyApp") {
+          return 404;  # Return HTTP 404 Not Found
+      }
+  }
+  
+  server {
+      listen 443 ssl;
+      server_name auth.example.com;
+  }
+  
+  server {
+      listen 443 ssl;
+      server_name download.example.com;
+  }
+  ```
+  
+**Notes:**
+- The `$http_` variables in Nginx provide access to HTTP headers.
+- Regular expressions (`~` or `~*`) are used to match patterns in headers.
+- Use conditional blocks (`if`) judiciously to avoid unintended behavior or performance issues.
+- Return appropriate HTTP status codes (e.g., `404`, `401`) to signal blocked or unauthorized access.
