@@ -23,6 +23,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Inspect and Control Request Headers](#inspect-and-control-request-headers)**
 	- **[Utilizing the Location Block](#utilizing-the-location-block)**
 	- **[Restrict Access to the Proxy Servers and Local Networks](#restrict-access-to-the-proxy-servers-and-local-networks)**
+	- **[General Configurations Directives and Best Practices](#general-configurations-directives-and-best-practices)**
 
 
 
@@ -903,6 +904,109 @@ if [ $UFW_RULES = true ] ; then
         /usr/sbin/ufw reload > /dev/null
 fi
 
+  ```
+
+## General Configurations Directives and Best Practices
 
 
+  ```nginx
+# security headers
+add_header Set-Cookie                "Path=/; HttpOnly; Secure";
+
+
+# This header enables the Cross-site scripting (XSS) filter built into most recent web browsers.
+# It's usually enabled by default anyway, so the role of this header is to re-enable the filter for
+# this particular website if it was disabled by the user.
+add_header X-XSS-Protection          "1; mode=block" always;
+
+
+# when serving user-supplied content, include a X-Content-Type-Options: nosniff header along with the Content-Type: header,
+# to disable content-type sniffing on some browsers.
+add_header X-Content-Type-Options    "nosniff" always;
+
+
+add_header Referrer-Policy           "no-referrer-when-downgrade" always;
+add_header Permissions-Policy        "interest-cohort=()" always;
+
+
+
+# config to enable HSTS(HTTP Strict Transport Security) https://developer.mozilla.org/en-US/docs/Security/HTTP_Strict_Transport_Security|
+# to avoid ssl stripping
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+
+
+# config to don't allow the browser to render the page inside an frame or iframe
+# and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking|
+# if you need to allow [i]frames, you can use SAMEORIGIN or even set an uri with ALLOW-FROM uri
+add_header X-Frame-Options           "DENY" always;
+
+
+# with Content Security Policy (CSP) enabled(and a browser that supports it),you can tell the browser that it can only download content from the domains you explicitly allow
+# I need to change our application code so we can increase security by disabling 'unsafe-inline' 'unsafe-eval'|
+# directives for css and js(if you have inline css or js, you will need to keep it too).|
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ssl.google-analytics.com https://assets.zendesk.com https://connect.facebook.net; img-src 'self' https://ssl.google-analytics.com https://s-static.ak.facebook.com https://assets.zendesk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://assets.zendesk.com; font-src 'self' https://themes.googleusercontent.com; frame-src https://assets.zendesk.com https://www.facebook.com https://s-static.ak.facebook.com https://tautt.zendesk.com; object-src 'none'";
+
+
+# . files
+location ~ /\.(?!well-known) {
+    deny all;
+}
+
+location /LICENSE {
+    deny all;
+}
+
+location ~ ^\. {
+    deny all;
+}
+
+location ~ \.(ini|log|sh|md|txt|json|lock)$ {
+    deny all;
+}
+
+location ~ /\.git {
+    deny all;
+}
+
+# Block common hacks
+
+location ~* .(display_errors|set_time_limit|allow_url_include.*disable_functions.*open_basedir|set_magic_quotes_runtime|webconfig.txt.php|file_put_contentssever_root|wlwmanifest) {
+    deny all;
+}
+
+location ~* .(globals|encode|localhost|loopback|xmlrpc|revslider|roundcube|webdav|smtp|http\:|soap|w00tw00t) {
+    deny all;
+}
+
+# Protect other sensitive files
+
+location ~* \.(engine|inc|info|install|make|module|profile|test|po|sh|.*sql|theme|tpl(\.php)?|xtmpl)$|^(\..*|Entries.*|Repository|Root|Tag|Template)$|\.php_ {
+    deny all;
+}
+
+# Help guard against SQL injection
+
+location ~* .(\;|\'|\"|%22).*(request|insert|union|declare|drop)$ {
+    deny all;
+}
+
+
+# Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
+ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+
+# enables server-side protection from BEAST attacks
+ssl_prefer_server_ciphers on;
+
+# disable SSLv3(enabled by default since nginx 0.8.19) since it's less secure 
+ssl_protocols TLSv1.2 TLSv1.3;
+
+# ciphers chosen for forward secrecy and compatibility
+ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+
+# enable ocsp stapling (mechanism by which a site can convey certificate revocation information to visitors in a privacy-preserving, scalable manner)
+resolver 8.8.8.8 8.8.4.4;
+ssl_stapling on;
+ssl_stapling_verify on;
+ssl_trusted_certificate /etc/nginx/ssl/star_forgott_com.crt;
   ```
