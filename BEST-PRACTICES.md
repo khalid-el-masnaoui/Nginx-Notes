@@ -259,3 +259,42 @@ Major browsers like Chrome, Microsoft Edge, and Firefox have dropped support for
   ```
 - After configuration, verify the SSL security status using [SSL Labs' SSL Test.](https://www.ssllabs.com/ssltest/)
 - Refer to [Mozilla's SSL Configuration Generator](https://ssl-config.mozilla.org/) for specific configurations based on your web server and OpenSSL version.
+
+
+## Ensure Proper Permissions on SSL Certificate Files
+In cases where a web service vulnerability allows remote access to web server permissions, attackers may attempt to access SSL certificate files, potentially leading to the exposure of the private key. If the SSL certificate's private key is leaked, an attacker could create a spoofed website that appears legitimate or use the key to distribute malware. This becomes especially dangerous when SSL certificate pinning is used, or if the certificate is a wildcard certificate, as it could necessitate replacing certificates across all servers and clients.
+
+Ensure that SSL certificate files are secured by verifying and applying proper file permissions.
+
+**Audit:**
+- Verify the file ownership and permissions for the `ssl_certificate` and `ssl_certificate_key` files.
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+  server {
+          listen       443 ssl;
+          server_name  example.com;
+          ...
+          ssl_certificate /etc/nginx/conf.d/cert/example.com_ssl.crt;
+          ssl_certificate_key /etc/nginx/conf.d/cert/example.com_ssl.key;
+          ...
+    }
+  
+  
+  [root@localhost ~]# ls -al /etc/nginx/conf.d/cert
+  total 12
+  drwxr-x---. 2 root root   64 Apr  8 14:47 .
+  drwxr-x---. 4 root root   68 Aug 12 11:06 ..
+  -rw-r--r--. 1 nobody root 7869 Apr  8 14:45 example.com_ssl.crt
+  -rw-r--r--. 1 nobody root 1679 Apr  8 14:44 example.com_ssl.key
+  ```
+
+**Remediation:**
+- Set the ownership of certificate and key files to `root:root`.
+- Adjust the file permissions to `600` or `400` to prevent leaked.
+  ```bash
+  [root@localhost ~]# chown root:root -R /etc/nginx/conf.d/cert/example.com_ssl.crt
+  [root@localhost ~]# chown root:root -R /etc/nginx/conf.d/cert/example.com_ssl.key
+  [root@localhost ~]# chmod 400 /etc/nginx/conf.d/cert/example.com_ssl.crt
+  [root@localhost ~]# chmod 400 /etc/nginx/conf.d/cert/example.com_ssl.key
+  ```
