@@ -210,3 +210,52 @@ It is important to disable any methods that are not in use, particularly the `TR
   ...
   ```
 ***Note: The $request_method directive can be applied at the server or location block level as needed.***
+
+## Ensure Removal of Insecure and Outdated SSL Protocols and Ciphers
+When configuring SSL, outdated and insecure protocols or algorithms should be avoided. 
+
+Major browsers like Chrome, Microsoft Edge, and Firefox have dropped support for TLS 1.0 and TLS 1.1 due to security vulnerabilities such as POODLE and BEAST. These older protocols are known to be vulnerable to various attacks.
+
+| No. | CVE-ID        | Vulnerability Name                                      | Description                                                                |
+|-----|---------------|---------------------------------------------------------|----------------------------------------------------------------------------|
+| 1   | CVE-2014-3566 | POODLE (Padding Oracle On Downgraded Legacy Encryption) | Exploits outdated encryption methods, enabling protocol downgrade attacks. |
+| 2   | CVE-2011-3389 | BEAST (Browser Exploit Against SSL/TLS)                 | Allows attackers to decrypt HTTPS cookies and hijack sessions.             |
+
+**Deprecated Cipher Algorithms**
+- The following cipher algorithms are considered insecure and should not be used:
+  - RC4 
+  - DES 
+  - 3DES 
+  - MD5 
+  - aNULL 
+  - eNULL 
+  - EXPORT
+
+**Audit:**
+- Verify the SSL settings for `ssl_protocols` and `ssl_ciphers` configurations.
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+  
+  server {
+          listen       443 ssl;
+          server_name  example.com;  
+          ...  
+          ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
+          ssl_ciphers HIGH:MEDIUM:aNULL:MD5:EXPORT:RC4:eNULL:DES:3DES;
+    }
+  ```
+
+**Remediation:**
+- `ssl_protocols` should use TLS 1.2 or later.
+- `ssl_ciphers` to utilize secure algorithms supported in TLS 1.2 or later.
+
+**Recommended Configuration (General Use):**
+
+- For general services (not bound by PCI-DSS), use the following configuration:
+  ```
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
+  ```
+- After configuration, verify the SSL security status using [SSL Labs' SSL Test.](https://www.ssllabs.com/ssltest/)
+- Refer to [Mozilla's SSL Configuration Generator](https://ssl-config.mozilla.org/) for specific configurations based on your web server and OpenSSL version.
