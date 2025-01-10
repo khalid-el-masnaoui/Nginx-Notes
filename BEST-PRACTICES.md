@@ -123,3 +123,40 @@ The autoindex feature provides directory listing functionality. Directory listin
       index  index.html index.htm;  # <== Remove if necessary
   }
   ```
+
+## Set Proper Permissions for Critical Directories and Files
+Ensure that the Nginx installation directory and configuration files are accessible only to the "root" user. The permissions for these directories and files should be checked and modified if any other users have access rights.
+
+**Audit:**
+- Verify the permissions of Nginx's installation directory and configuration files.
+  ```bash
+  [root@localhost ~]# ls -al /etc/nginx/
+  total 88
+  drwxr-xr-x.  4 root  root  4096 Aug 12 11:28 .
+  drwxr-xr-x. 87 root  root  8192 Aug  6 11:46 ..
+  drwxr-xr-x.  4 root  root    68 Aug 12 11:06 conf.d
+  drwxr-xr-x.  2 root  root     6 Jun 10  2021 default.d
+  -rw-r--r--.  1 root  root  1077 Jun 10  2021 fastcgi.conf
+  -rw-r--r--.  1 root  root  1077 Jun 10  2021 fastcgi.conf.default
+  -rw-r--r--.  1 root  root  1007 Jun 10  2021 fastcgi_params
+  -rw-r--r--.  1 root  root  1007 Jun 10  2021 fastcgi_params.default
+  -rw-r--r--.  1 root  root  2837 Jun 10  2021 koi-utf
+  -rw-r--r--.  1 root  root  2223 Jun 10  2021 koi-win
+  -rw-r--r--.  1 root  root  5170 Jun 10  2021 mime.types
+  -rw-r--r--.  1 root  root  5170 Jun 10  2021 mime.types.default
+  -rw-r--r--.  1 root  root   927 Oct 16  2023 nginx.conf
+  -rw-r--r--.  1 root  root  2656 Jun 10  2021 nginx.conf.default
+  -rw-r--r--.  1 root  root   636 Jun 10  2021 scgi_params
+  -rw-r--r--.  1 root  root   636 Jun 10  2021 scgi_params.default
+  -rw-r--r--.  1 root  root   664 Jun 10  2021 uwsgi_params
+  -rw-r--r--.  1 root  root   664 Jun 10  2021 uwsgi_params.default
+  -rw-r--r--.  1 root  root  3610 Jun 10  2021 win-utf
+  ```
+
+**Remediation:**
+- Ensure that all Nginx directories and configuration files are owned by root:root.
+- Adjust the permissions so that others (non-owners) cannot access the directories and files.
+  ```bash
+  [root@localhost ~]# chown root:root -R /etc/nginx
+  [root@localhost ~]# chmod o-rwx -R /etc/nginx
+  ```
