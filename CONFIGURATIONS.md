@@ -44,7 +44,7 @@ All you need for Configuring Nginx in one place.
     - **[`tcp_nodelay`](#the-tcp_nodelay-directive)**
     - **[`keepalive_timeout`](#the-keepalive_timeout-directive)**
     - **[Gzip related directives](#gzip-related-directives)**
-    -  **[Deferred](#deferred)**
+    -  **[`Deferred`](#the-deferred-directive)**
 ## Configuration Directory Structure
 
 Here's an overview of this Nginx configuration directory structure:
@@ -724,7 +724,7 @@ There are also several other directives you can set related to gzip:
 * `gzip_vary` => Enables or disables inserting the “Vary: Accept-Encoding” header in response.
 
 
-### Deferred
+### The `deferred`directive
 normally the socket handler's thread is woken up when the connection is accepted (which is still after the three way handshake completes), and for some protocols activity starts here (e.g. an SMTP server sends a 220 greeting line), but for HTTP the first message in the conversation is the web browser sending its GET/POST/etc line, and until this happens the HTTP server has no interest in the connection (other than timing it out), thus waking up the HTTP process when the socket accept completes is a wasteful activity as the process will immediately fall asleep again waiting for the necessary data.
 
 ```nginx
