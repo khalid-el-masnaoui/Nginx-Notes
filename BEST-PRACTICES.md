@@ -22,6 +22,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Limit Requests per IP](#10-limit-requests-per-ip)**
 	- **[Inspect and Control Request Headers](#inspect-and-control-request-headers)**
 	- **[Utilizing the Location Block](#utilizing-the-location-block)**
+	- **[Restrict Access to the Proxy Servers and Local Networks](#restrict-access-to-the-proxy-servers-and-local-networks)**
 
 
 
@@ -771,3 +772,137 @@ The location block in Nginx is used to define how specific URIs are handled. Eac
   ```
   
 Using the location block effectively enhances web server performance, security, and user experience.
+
+
+## Restrict Access to the Proxy Servers and Local Networks
+This section contains a complete configuration examples for CloudFlare-only nginx, The goal is to close your web server to cloudflare-only traffic (as well as LANs) using firewall rules and [CloudFlare IP list](https://www.cloudflare.com/ips/).
+
+**Note** : We wont be covering the firewall rules for this , you can check my repository (**Linux-Server**) for that
+
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+  
+  http {
+      ...
+      # Cloudlfare ips
+      include nginxconfig.io/cloudflare_real_ips.conf;
+      include nginxconfig.io/cloudflare_whitelist.conf;
+  }
+  ...
+  ```
+
+
+
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginxconfig.io/cloudflare_whitelist.conf
+  ...
+  
+geo $realip_remote_addr $cloudflare_ip {
+  default 0;
+  127.0.0.0/8 1;
+  192.168.1.0/24 1;
+  173.245.48.0/20 1;
+  103.21.244.0/22 1;
+  103.22.200.0/22 1;
+  103.31.4.0/22 1;
+  141.101.64.0/18 1;
+  108.162.192.0/18 1;
+  190.93.240.0/20 1;
+  188.114.96.0/20 1;
+  197.234.240.0/22 1;
+  198.41.128.0/17 1;
+  162.158.0.0/15 1;
+  104.16.0.0/13 1;
+  104.24.0.0/14 1;
+  172.64.0.0/13 1;
+  131.0.72.0/22 1;
+}
+
+# if you wish to only allow cloudflare IP's add this to your site block for each host:
+#if ( != 1) {
+#       return 403;
+#}
+
+  ...
+  ```
+
+  ```nginx
+  server {
+    ...
+    # Cloudlfare ips
+	if ($cloudflare_ip != 1) {
+		return 403;
+	}
+	...
+  }
+  ```
+
+To ensure the cloudflare ips are automatically included , we prepare a bash script to ensure that CloudFlare ip addresses are automatically refreshed every week (you can choose any frequency), and nginx will be realoded when synchronization is completed. 
+
+```bash
+[root@localhost ~]# crontab -e
+...
+#IPS
+@weekly /bin/bash /etc/nginx/scripts/cloudflare-ips.sh
+...
+  ```
+
+**Note** : the script below add cloudflare-ips, internal ips and loopack ips , and allow connection from these ips using "ufw firewall rules", if you dont need this you can set `UFW_RULES=false`
+
+```bash
+[root@localhost ~]# vim /etc/nginx/scripts/cloudflare-ips.sh
+...
+#!/bin/bash
+
+CLOUDFLARE_REAL_IPS_PATH=/etc/nginx/nginxconfig.io/cloudflare_real_ips.conf
+CLOUDFLARE_WHITELIST_PATH=/etc/nginx/nginxconfig.io/cloudflare_whitelist.conf
+
+UFW_RULES=true
+TRUSTED_IP_LOOPACK="127.0.0.0/8"
+TRUSTED_IP_INTERNAL="192.168.1.0/24"
+
+set -e
+
+for file in $CLOUDFLARE_REAL_IPS_PATH $CLOUDFLARE_WHITELIST_PATH; do
+        echo "# https://www.cloudflare.com/ips" > $file
+        echo "# Generated at $(LC_ALL=C date)" >> $file
+done
+
+echo "geo \$realip_remote_addr \$cloudflare_ip {
+        default 0;
+    $TRUSTED_IP_LOOPACK 1;
+    $TRUSTED_IP_INTERNAL 1;" >> $CLOUDFLARE_WHITELIST_PATH
+
+for type in v4; do
+        echo "# IP$type"
+
+        for ip in `curl https://www.cloudflare.com/ips-$type`; do
+                echo "set_real_ip_from $ip;" >> $CLOUDFLARE_REAL_IPS_PATH;
+                echo "  $ip 1;" >> $CLOUDFLARE_WHITELIST_PATH;
+                if [ $UFW_RULES = true ] ; then
+                        ufw allow from $ip to any app 'Nginx Full'  comment "cloudflare"
+                        ufw allow from $ip to any app 'Nginx Full'  comment "cloudflare"
+                fi
+        done
+done
+
+echo "}
+# if you wish to only allow cloudflare IP's add this to your site block for each host:
+#if ($cloudflare_ip != 1) {
+#       return 403;
+#}" >> $CLOUDFLARE_WHITELIST_PATH
+echo "real_ip_header CF-Connecting-IP;" >> $CLOUDFLARE_REAL_IPS_PATH
+
+nginx -t && systemctl reload nginx # test configuration and reload nginx
+
+# reload firewall
+if [ $UFW_RULES = true ] ; then
+        ufw allow from $TRUSTED_IP_LOOPACK to any app 'Nginx Full' comment "internal-subnet"
+    ufw allow from $TRUSTED_IP_INTERNAL to any app 'Nginx Full' comment "internal-subnet"
+        /usr/sbin/ufw reload > /dev/null
+fi
+
+
+
+  ```
