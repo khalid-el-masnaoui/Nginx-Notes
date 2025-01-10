@@ -457,3 +457,56 @@ Ensure that your web server is configured to only respond to requests made to th
 **Notes:**
 - Ensuring that requests with incorrect host header are blocked is a critical part of web server security.
 - `Many web servers are not configured this way by default`, making this an essential configuration for system administrators to apply.
+
+
+  
+## Limit Simultaneous Connections per IP
+Limiting the number of simultaneous connections from a single IP address is a critical step in preventing resource exhaustion and ensuring the availability of services. By implementing connection limits, you can mitigate the risk of slow denial-of-service (DoS) attacks and maintain stable web server performance.
+
+**Audit:**
+- Verifying Simultaneous Connections
+- To audit the current simultaneous connections per IP, you can monitor server logs or analyze connection counts using tools like Nginx’s built-in logging or external monitoring systems.
+
+**Remediation:** 
+- Configuring Connection Limits
+
+(1) Define a Shared Memory Zone
+- Use the limit_conn_zone directive in the http block to create a shared memory zone that tracks connections by IP. Example:
+  ```nginx
+  http {
+      limit_conn_zone $binary_remote_addr zone=limitperip:10m;
+      ...
+  }
+  ```
+- `Memory Allocation:` 10MB can store approximately **160,000 unique IPs**.
+- `Tracking Mechanism:` $binary_remote_addr tracks client IPs efficiently.
+
+(2) Apply Connection Limits
+- Use the limit_conn directive to enforce restrictions at the server or location level. Examples:
+  ```nginx
+  server {
+      listen 443 ssl;
+      server_name auth.example.com;
+  
+      # Allow a maximum of 10 simultaneous connections per IP
+      limit_conn limitperip 10;
+  }
+  
+  server {
+      listen 443 ssl;
+      server_name download.example.com;
+  
+      location /download/ {
+          # Restrict simultaneous connections to 3 per IP for this location
+          limit_conn limitperip 3;
+          limit_conn_status 429;  # Return HTTP 429 (Too Many Requests)
+      }
+  }
+  ```
+
+**Notes:**
+- The `ngx_http_limit_conn_module` module must be enabled.
+- Fine-tune memory allocation and limits based on your server’s capacity and traffic profile.
+- The configuration ensures that excessive connections from a single IP do not degrade server performance or accessibility for other users.
+
+By enforcing simultaneous connection limits, you can protect your server from potential abuse and maintain service quality under high-load scenarios.
