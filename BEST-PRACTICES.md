@@ -510,3 +510,50 @@ Limiting the number of simultaneous connections from a single IP address is a cr
 - The configuration ensures that excessive connections from a single IP do not degrade server performance or accessibility for other users.
 
 By enforcing simultaneous connection limits, you can protect your server from potential abuse and maintain service quality under high-load scenarios.
+
+## Limit Requests per IP
+Rate limiting per IP address in Nginx helps maintain stable web services by controlling the number of requests a client can make within a given timeframe. This configuration prevents abuse by users generating excessive requests and protects the server from being overwhelmed.
+
+**Audit:**
+- Verifying Request Limits
+- To check if rate-limiting is configured:
+  - Review the Nginx configuration file for `limit_req_zone` and `limit_req` directives.
+  - Analyze the server logs to identify patterns of excessive requests or potential abuse.
+
+
+**Remediation:**
+- Configuring Rate Limits
+
+(1) Define a Shared Memory Zone
+- Use the `limit_req_zone` directive to allocate a shared memory zone that tracks request rates by IP. Example:
+  ```nginx
+  http {
+      limit_req_zone $binary_remote_addr zone=ratelimit:10m rate=5r/s;
+      ...
+  }
+  ```
+- `Memory Allocation`: 10MB can store approximately 160,000 unique IPs.
+- `Rate:` Limits each IP to 5 requests per second (`5r/s`).
+
+(2) Apply Request Limits
+- Use the `limit_req` directive in the `location` block to enforce the rate limits. Example:
+  ```nginx
+  server {
+      listen 443 ssl;
+      server_name auth.example.com;
+  
+      location / {
+          limit_req zone=ratelimit burst=10 nodelay;
+          limit_req_status 429;  # Return HTTP 429 (Too Many Requests)
+      }
+  }
+  ```
+- `Burst:` Allows up to 10 requests to be queued during traffic spikes.
+- `nodelay:` Ensures all requests in the burst are processed immediately without delay.
+
+**Notes:**
+- The `ngx_http_limit_conn_module` module must be enabled.
+- Adjust the rate and burst settings to align with your application's traffic profile.
+- Rate limits help maintain consistent performance by preventing abuse while accommodating occasional bursts of traffic.
+
+By implementing IP-based rate limits, you can protect your server from misuse and ensure a reliable experience for legitimate users.
