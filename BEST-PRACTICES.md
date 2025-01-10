@@ -298,3 +298,162 @@ Ensure that SSL certificate files are secured by verifying and applying proper f
   [root@localhost ~]# chmod 400 /etc/nginx/conf.d/cert/example.com_ssl.crt
   [root@localhost ~]# chmod 400 /etc/nginx/conf.d/cert/example.com_ssl.key
   ```
+
+## Ensure Blocking of Arbitrary Host Connections Not Configured in the Web Server
+In a typical web server configuration, if someone knows the server's IP address, they might still be able to access the web service without knowing the valid hostname (domain). By isolating and blocking access to requests made to non-service hosts, you can reduce unnecessary connections that shouldn't lead to your service, thereby reducing server load and improving performance.
+
+Blocking such arbitrary connections also enhances security by preventing various types of web service attacks, such as host header injection and IP address-based scanning.
+
+Ensure that your web server is configured to only respond to requests made to the correct service host, while blocking all others.
+
+**Audit:**
+- Verify that unknown host requests are accepting when accessing the web server.
+
+**(Vulnerable) Web server accepting connections with unknown host requests:**
+  ```bash
+  [root@localhost ~]# curl -k -v https://192.168.130.23 -H 'Host: invalid.host.com'
+  *   Trying 192.168.130.23:443...
+  * Connected to 192.168.130.23 (192.168.130.23) port 443
+  * ALPN: curl offers h2,http/1.1
+  * TLSv1.3 (OUT), TLS handshake, Client hello (1):
+  * TLSv1.3 (IN), TLS handshake, Server hello (2):
+  * TLSv1.2 (IN), TLS handshake, Certificate (11):
+  * TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+  * TLSv1.2 (IN), TLS handshake, Server finished (14):
+  * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+  * TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
+  * TLSv1.2 (OUT), TLS handshake, Finished (20):
+  * TLSv1.2 (IN), TLS handshake, Finished (20):
+  * SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384 / prime256v1 / rsaEncryption
+  * ALPN: server did not agree on a protocol. Uses default.
+  * Server certificate:
+  *  subject: CN=*.example.com
+  *  start date: Jan  2 00:00:00 2024 GMT
+  *  expire date: Jan 20 23:59:59 2025 GMT
+  *  issuer: C=GB; ST=Greater Manchester; L=Salford; O=Sectigo Limited; CN=Sectigo RSA Domain Validation Secure Server CA
+  *  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+  *   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+  *   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha384WithRSAEncryption
+  *   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha384WithRSAEncryption
+  * using HTTP/1.x
+  > GET / HTTP/1.1
+  > Host: invalid.host.com
+  > User-Agent: curl/8.5.0
+  > Accept: */*
+  >
+  < HTTP/1.1 200 OK
+  < Date: Mon, 12 Aug 2024 05:35:40 GMT
+  < Server: Nginx
+  < Cache-Control: no-cache, no-store, must-revalidate
+  < Expires: Thu, 01 Jan 1970 09:00:00 KST
+  ...
+  ```
+
+**(Not Vulnerable) Web server not accepting connections with unknown host requests:**
+  ```bash
+  [root@localhost ~]# curl -k -v https://192.168.130.236 -H 'Host: invalid.host.com'
+  *   Trying 192.168.130.236:443...
+  * Connected to 192.168.130.236 (192.168.130.236) port 443 (#0)
+  * ALPN: offers h2
+  * ALPN: offers http/1.1
+  * (304) (OUT), TLS handshake, Client hello (1):
+  * (304) (IN), TLS handshake, Server hello (2):
+  * (304) (IN), TLS handshake, Unknown (8):
+  * (304) (IN), TLS handshake, Certificate (11):
+  * (304) (IN), TLS handshake, CERT verify (15):
+  * (304) (IN), TLS handshake, Finished (20):
+  * (304) (OUT), TLS handshake, Finished (20):
+  * SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256
+  * ALPN: server accepted http/1.1
+  * Server certificate:
+  *  subject: CN=*.example.com
+  *  start date: Jan  2 00:00:00 2024 GMT
+  *  expire date: Jan 20 23:59:59 2025 GMT
+  *  issuer: C=GB; ST=Greater Manchester; L=Salford; O=Sectigo Limited; CN=Sectigo RSA Domain Validation Secure Server CA
+  *  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+  *   Certificate level 0: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+  *   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha384WithRSAEncryption
+  *   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha384WithRSAEncryption
+  * using HTTP/1.x
+  > GET / HTTP/1.1
+  > Host: invalid.host.com
+  > User-Agent: curl/7.84.0
+  > Accept: */*
+  >
+  * Mark bundle as not supporting multiuse
+  < HTTP/1.1 403 Forbidden
+  < Server: Nginx
+  < Date: Mon, 12 Aug 2024 05:32:49 GMT
+  < Content-Type: text/html
+  < Content-Length: 162
+  < Connection: keep-alive
+  <
+  <html>
+  <head><title>403 Forbidden</title></head>
+  <body bgcolor="white">
+  <center><h1>403 Forbidden</h1></center>
+  <hr><center>Nginx</center>
+  </body>
+  </html>
+  * Connection #0 to host 192.168.130.236 left intact
+  ```
+
+**Remediation:**
+- Create a virtual host that processes and blocks requests with host headers that do not match the intended service hosts.
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+  
+  # VirtualHost to handle and block requests with unmatched host headers
+  server {
+          listen       80 default_server;
+          listen       443 default_server ssl;
+  
+          error_log    /var/log/nginx/http.unknown-header.error.log;
+          access_log   /var/log/nginx/http.unknown-header.access.log  main;
+  
+          ssl_certificate /etc/nginx/conf.d/cert/example.com_ssl.crt;
+          ssl_certificate_key /etc/nginx/conf.d/cert/example.com_ssl.key;
+          ssl_session_cache shared:SSL:1m;
+          ssl_session_timeout  10m;
+  
+          ssl_protocols TLSv1.2 TLSv1.3;
+          ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
+          
+          location / {
+               deny all;
+          }
+  }
+  
+  # VirtualHost for the valid service hostname (example.com)
+  server {
+          listen       80;
+          server_name  example.com;
+  
+          location / {
+            return 301 https://example.com$request_uri;
+          }
+          ...
+  }
+      
+  server {
+          listen       443 ssl;
+          server_name  example.com;
+  
+          error_log    /var/log/nginx/example.com.error.log;
+          access_log   /var/log/nginx/example.access.log  main;
+  
+          ssl_certificate /etc/nginx/conf.d/cert/example.com_ssl.crt;
+          ssl_certificate_key /etc/nginx/conf.d/cert/example.com_ssl.key;
+          ssl_session_cache shared:SSL:1m;
+          ssl_session_timeout  10m;
+  
+          ssl_protocols TLSv1.2 TLSv1.3;
+          ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
+          ...
+  }
+  ```
+
+**Notes:**
+- Ensuring that requests with incorrect host header are blocked is a critical part of web server security.
+- `Many web servers are not configured this way by default`, making this an essential configuration for system administrators to apply.
