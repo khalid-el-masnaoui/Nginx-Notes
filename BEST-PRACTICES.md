@@ -79,7 +79,7 @@ By default, Nginx HTTP Server displays the version information in the HTTP respo
 
 **Audit:**
 - Verify that Nginx version information is exposed in the HTTP response header:
-  ```bash
+  ```nginx
   [root@localhost ~]# curl -i -k http://127.0.0.1
   HTTP/1.1 200
   Server: nginx/1.26.1
@@ -87,10 +87,39 @@ By default, Nginx HTTP Server displays the version information in the HTTP respo
   ```
 **Remediation:**
 - To prevent the version information from being exposed, modify the following settings in the Nginx configuration:
-  ```bash
+  ```nginx
   [root@localhost ~]# vim /etc/nginx/nginx.conf
   http {
         ...
         server_tokens off;  # <== Set to hide version information
         ...
+  ```
+
+## Ensure the autoindex Feature is removed or disabled
+The autoindex feature provides directory listing functionality. Directory listing can expose critical information about the web application and server, and should be disabled by default.
+
+**Audit:**
+- Verify whether directory listing is displayed or the autoindex feature is enabled.
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+  
+  location / {        
+      root   /usr/local/nginx/html/html;
+      autoindex on;
+      index  index.html index.htm;
+  }
+  ```
+
+**Remediation:**
+- To disable the autoindex feature, remove or comment out the autoindex directive in the Nginx configuration:
+  ```nginx
+  [root@localhost ~]# vim /etc/nginx/nginx.conf
+  ...
+
+  location / {        
+      root   /usr/local/nginx/html/html;
+      autoindex on;                 # <== Remove or comment out
+      index  index.html index.htm;  # <== Remove if necessary
+  }
   ```
