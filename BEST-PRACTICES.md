@@ -14,6 +14,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Client Caching](#client-caching)**
 	- **[SSL Caching](#ssl-caching)**
 	- **[External System Settings](#external-system-settings)**
+
 - **[Security](#securoty)**
 	- **[Ensure Proper Permissions for Nginx Process Account](#ensure-proper-permissions-for-nginx-process-account)**
 	- **[Ensure Nginx Version Information is Not Exposed](#ensure-nginx-version-information-is-not-exposed)**
@@ -28,7 +29,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Inspect and Control Request Headers](#inspect-and-control-request-headers)**
 	- **[Utilizing the Location Block](#utilizing-the-location-block)**
 	- **[Restrict Access to the Proxy Servers and Local Networks](#restrict-access-to-the-proxy-servers-and-local-networks)**
-	- **[FastCgi Timeouts](#fastcgi-timeouts)
+	- **[FastCgi Timeouts](#fastcgi-timeouts)**
 	- **[General Configurations Directives and Best Practices](#general-configurations-directives-and-best-practices)**
 
 # Performance Optimizations
@@ -175,6 +176,37 @@ location ~* \.(?:svgz?|ttf|ttc|otf|eot|woff2?)$ {
 ssl_session_timeout    1d;
 ssl_session_cache      shared:SSL:128m;
 ```
+
+## External System Settings
+
+**Increase The Maximum Number Of Open Files (`nofile` limit) – Linux**
+
+*_nofile_* :  value that refers to the maximum number of open files for a single process.
+
+```bash
+[root@localhost ~]# vim /etc/security/limits.conf
+...
+www-data soft nofile 200000 # <== add this line
+www-data hard nofile 200000 # <== add this line
+...
+[root@localhost ~]# sysctl -p
+[root@localhost ~]# vim /etc/pam.d/common-session
+...
+session required pam_limits.so # <== add this line
+...
+[root@localhost ~]# vim /etc/default/nginx
+...
+ULIMIT="-n 65535" # <== add this line
+```
+
+To confirm the limits per nginx process is taking effect
+
+```bash
+[root@localhost ~]# ps -ef | grep "nginx" #<== get one of nginx workers pid
+
+cat /proc/{PID}/limits #<== displays the limit
+```
+
 
 # Security
 
