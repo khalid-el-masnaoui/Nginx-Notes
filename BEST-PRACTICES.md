@@ -208,6 +208,34 @@ cat /proc/{PID}/limits #<== displays the limit
 ```
 
 
+**other linux tuning**
+
+**Note** : We wont be covering linux tunning in details here, you can check my repository (**Linux-Server**) for that
+
+Change the following kernel parameters to increase the number of ephemeral ports, |reduce TIME_WAIT and increase the allowed listen backlog.
+
+```bash
+[root@localhost ~]# vim /etc/sysctl.conf
+
+# ipv4
+net.ipv4.tcp_syncookies=1
+net.ipv4.tcp_max_syn_backlog=81920
+net.ipv4.tcp_synack_retries=3
+net.ipv4.tcp_syn_retries=3
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_keepalive_time = 300
+net.ipv4.tcp_tw_reuse = 1
+#net.ipv4.tcp_tw_recycle = 1
+net.ipv4.ip_local_port_range = 20000 65000
+net.ipv4.tcp_max_tw_buckets = 200000
+net.ipv4.route.max_size = 5242880
+net.ipv4.tcp_fastopen = 3
+
+...
+[root@localhost ~]# sysctl -p
+```
+
+
 # Security
 
 ## Ensure Proper Permissions for Nginx Process Account
