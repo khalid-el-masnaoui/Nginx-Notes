@@ -171,6 +171,11 @@ location ~* \.(?:svgz?|ttf|ttc|otf|eot|woff2?)$ {
 
 ## SSL Caching
 
+```nginx
+ssl_session_timeout    1d;
+ssl_session_cache      shared:SSL:128m;
+```
+
 # Security
 
 ## Ensure Proper Permissions for Nginx Process Account
