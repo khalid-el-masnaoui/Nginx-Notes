@@ -46,6 +46,7 @@ error_log /var/log/nginx/error.log crit;
 events {
     # determines how much clients will be served per worker
     # max clients = worker_connections * worker_processes
+    # Should be equal to `ulimit -n / worker_processes`
     # max clients is also limited by the number of socket connections available on the system (~64k)
     #a process(Worker_process) can have n number of threads(worker_connections).
     worker_connections 4000;
@@ -160,6 +161,20 @@ location ~* \.(?:svgz?|ttf|ttc|otf|eot|woff2?)$ {
 }
 
 
+```
+
+## FastCgi Timeouts
+
+```nginx
+location ~ \.php$ {
+fastcgi_buffer_size 128k;  
+fastcgi_buffers 256 16k;  
+fastcgi_busy_buffers_size 256k;  
+fastcgi_temp_file_write_size 256k;  
+fastcgi_read_timeout 600;#if need it*
+fastcgi_send_timeout 600;#if need it*
+fastcgi_connect_timeout 600;#if need it*
+...
 ```
 
 # Security
