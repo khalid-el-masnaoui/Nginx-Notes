@@ -132,6 +132,35 @@ gzip_disable "MSIE [1-6]\.";
 ```
 This enables compression for files that are over 10k.
 
+## Client Caching
+A simple way of avoiding your server handling requests is if remote clients believe their content is already up-to-date.
+
+To do this you want to set suitable cache-friendly headers, and a simple way of doing that is to declare that all images, etc, are fixed for a given period of time:
+```nginx
+# favicon.ico
+location = /favicon.ico {
+    log_not_found off;
+    access_log    off;
+}
+
+
+# assets, media
+location ~* \.(?:css(\.map)?|js(\.map)?|jpe?g|png|gif|ico|cur|heic|webp|tiff?|mp3|m4a|aac|ogg|midi?|wav|mp4|mov|webm|mpe?g|avi|ogv|flv|wmv)$ {
+    expires    7d;
+    add_header Cache-Control "public";
+    access_log off;
+    #add_header Vary: Accept-Encoding; enabled by gzip
+}
+
+# svg, fonts
+location ~* \.(?:svgz?|ttf|ttc|otf|eot|woff2?)$ {
+    add_header Access-Control-Allow-Origin "*";
+    expires    7d;
+    access_log off;
+}
+
+
+```
 
 # Security
 
