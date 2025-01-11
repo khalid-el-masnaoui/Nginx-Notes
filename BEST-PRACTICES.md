@@ -96,6 +96,42 @@ http {
 }
 ```
 
+## Compression
+One of the first things that many people try to do is to enable the gzip compression module available with nginx. The intention here is that the objects which the server sends to requesting clients will be smaller, and thus faster to send.
+
+However this involves the trade-off common to tuning, performing the compression takes CPU resources from your server, which frequently means that you'd be better off not enabling it at all.
+
+Generally the best approach with compression is to only enable it for large files, and to avoid compressing things that are unlikely to be reduced in size (such as images, executables, and similar binary files).
+
+With that in mind the following is a sensible configuration:
+```nginx
+gzip            on;
+gzip_vary       on;
+gzip_min_length 10240;
+gzip_proxied    expired no-cache no-store private auth;
+gzip_comp_level 4;
+gzip_types
+    # text/html is always compressed by HttpGzipModule
+    text/css
+    text/javascript
+    text/xml
+    text/plain
+    text/x-component
+    application/javascript
+    application/x-javascript
+    application/json
+    application/xml
+    application/rss+xml
+    application/atom+xml
+    font/truetype
+    font/opentype
+    application/vnd.ms-fontobject
+    image/svg+xml;
+gzip_disable "MSIE [1-6]\.";
+
+```
+This enables compression for files that are over 10k.
+
 
 # Security
 
