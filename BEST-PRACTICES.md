@@ -1009,4 +1009,24 @@ resolver 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4 208.67.222.222 208.67.220.220 valid=1d;
 resolver_timeout       2s;
 ssl_stapling on;
 ssl_stapling_verify on;
+
+
+# if the request body size is more than the buffer size, then the entire (or partial)
+# request body is written into a temporary file
+client_body_buffer_size  128k;
+
+# buffer size for reading client request header
+client_header_buffer_size 3m;
+
+# maximum number and size of buffers for large headers to read from client request
+large_client_header_buffers 4 256k;
+
+# read timeout for the request body from client
+client_body_timeout   5;
+
+# how long to wait for the client to send a request header 
+client_header_timeout 5;
+
+# allow the server to close connection on non responding client, this will free up memory
+reset_timedout_connection on;
   ```
