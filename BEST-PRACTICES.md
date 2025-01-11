@@ -9,6 +9,11 @@ By following the key recommendations outlined below, you can avoid common config
 # Table of Contents
 
 - **[Performance Optimizations](#performance-optimizations)**
+	- **[General Tuning](#general-tuning)**
+	- **[Compression](#compression)**
+	- **[Client Caching](#client-caching)**
+	- **[SSL Caching](#ssl-caching)**
+	- **[External System Settings](#external-system-settings)**
 - **[Security](#securoty)**
 	- **[Ensure Proper Permissions for Nginx Process Account](#ensure-proper-permissions-for-nginx-process-account)**
 	- **[Ensure Nginx Version Information is Not Exposed](#ensure-nginx-version-information-is-not-exposed)**
@@ -23,6 +28,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Inspect and Control Request Headers](#inspect-and-control-request-headers)**
 	- **[Utilizing the Location Block](#utilizing-the-location-block)**
 	- **[Restrict Access to the Proxy Servers and Local Networks](#restrict-access-to-the-proxy-servers-and-local-networks)**
+	- **[FastCgi Timeouts](#fastcgi-timeouts)
 	- **[General Configurations Directives and Best Practices](#general-configurations-directives-and-best-practices)**
 
 # Performance Optimizations
@@ -163,19 +169,7 @@ location ~* \.(?:svgz?|ttf|ttc|otf|eot|woff2?)$ {
 
 ```
 
-## FastCgi Timeouts
-
-```nginx
-location ~ \.php$ {
-fastcgi_buffer_size 128k;  
-fastcgi_buffers 256 16k;  
-fastcgi_busy_buffers_size 256k;  
-fastcgi_temp_file_write_size 256k;  
-fastcgi_read_timeout 600;#if need it*
-fastcgi_send_timeout 600;#if need it*
-fastcgi_connect_timeout 600;#if need it*
-...
-```
+## SSL Caching
 
 # Security
 
@@ -1055,6 +1049,22 @@ if [ $UFW_RULES = true ] ; then
 fi
 
   ```
+
+
+## FastCgi Timeouts
+
+```nginx
+location ~ \.php$ {
+fastcgi_buffer_size 128k;  
+fastcgi_buffers 256 16k;  
+fastcgi_busy_buffers_size 256k;  
+fastcgi_temp_file_write_size 256k;  
+fastcgi_read_timeout 600;#if need it*
+fastcgi_send_timeout 600;#if need it*
+fastcgi_connect_timeout 600;#if need it*
+...
+```
+
 
 ## General Configurations Directives and Best Practices
 
