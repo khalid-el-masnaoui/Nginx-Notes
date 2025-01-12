@@ -247,7 +247,7 @@ You can read more about this awesome tool by reading [the official documentation
 
 **Note** : When doing performance testing with any tool, be aware of the testing the `ssl version` of your application
 
-#### Visualizing Results 
+### Visualizing Results 
 
 For **K6** , you can have a nice graphs and dashboards of the generated results with _Prometheus , InfluxDB, Grafana..._
 
