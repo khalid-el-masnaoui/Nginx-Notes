@@ -190,6 +190,8 @@ pcre_jit on;
 #### Enable 0-RTT for TLSv1.3
 > Generally speaking, 0-RTT is safe for most web sites and applications. If your web application does strange things and you’re concerned about its replay safety, consider not using 0-RTT until you can be certain that there are no negative effects. [...] TLS 1.3 is a big step forward for web performance and security. By combining TLS 1.3 with 0-RTT, the performance gains are even more dramatic.
 
+> Including 0-RTT (Zero Round Trip Time Resumption) results in a significant increase in efficiency and connection times. TLS 1.3 has a faster handshake that completes in 1-RTT. Additionally, it has a particular session resumption mode where, under certain conditions, it is possible to send data to the server on the first flight (0-RTT).
+
 ```nginx
   ssl_protocols TLSv1.2 TLSv1.3;
   # To enable 0-RTT (TLS 1.3):
@@ -1179,6 +1181,46 @@ proxy_hide_header X-Amz-Request-Id;
 
 # Hide other risky response headers:
 proxy_hide_header X-Runtime;
+```
+
+## Prevent Replay Attacks on Zero Round-Trip Time
+> 0-RTT Handshakes is part of the replacement of TLS Session Resumption and was inspired by the QUIC Protocol.
+
+> 0-RTT creates a significant security risk. With 0-RTT, a threat actor can intercept an encrypted client message and resend it to the server, tricking the server into improperly extending trust to the threat actor and thus potentially granting the threat actor access to sensitive data.
+
+> To protect against such attacks at the application layer, the `$ssl_early_data` variable should be used. You'll also need to ensure that the `Early-Data` header is passed to your application. `$ssl_early_data` returns 1 if TLS 1.3 early data is used and the handshake is not complete.
+
+> However, as part of the upgrade, you should disable 0-RTT until you can audit your application for this class of vulnerability.
+
+```nginx
+  location / {
+
+    proxy_pass http://backend_x20;
+    # It protect against such attacks at the application layer:
+    proxy_set_header Early-Data $ssl_early_data;
+
+  }
+```
+
+You need this sort of check on everything you want Replay protection on (eg. `POST /transfer_money`).
+
+While you can leave it off of something that has no side effects (eg. `GET /account_balance`).
+
+Because the attacker cannot decode the payload in the replay, the GET has no teeth and you can allow those requests to use TLS Early Data.
+
+**example** : Using it with PHP-FPM by setting a variable
+
+```nginx
+fastcgi_param  TLS_EARLY_DATA     $ssl_early_data;
+```
+
+Then in PHP you need to perform a check for any request that is at risk for a replay attack:
+
+```php
+if ($_SERVER['TLS_EARLY_DATA'] === '1') {
+    http_response_code(425);
+    exit;
+}
 ```
 
 ## General Configurations Directives and Best Practices
