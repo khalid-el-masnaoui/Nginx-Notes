@@ -13,6 +13,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Compression](#compression)**
 	- **[Client Caching](#client-caching)**
 	- **[SSL Caching](#ssl-caching)**
+	- **[Other Configurations](#other-configurations)
 	- **[External System Settings](#external-system-settings)**
 
 - **[Security](#securoty)**
@@ -173,6 +174,17 @@ ssl_session_timeout    1d;
 ssl_session_cache      shared:SSL:128m;
 ssl_session_tickets off;
 ssl_buffer_size 1400;
+```
+
+## Other Configurations
+
+####  Enable PCRE JIT to speed up processing of regular expressions
+
+> Enables the use of JIT for regular expressions to speed-up their processing. Specifically, checking rules can be time-consuming, especially complex regular expression (regex) conditions.
+
+```nginx
+# In global context:
+pcre_jit on;
 ```
 
 ## External System Settings
