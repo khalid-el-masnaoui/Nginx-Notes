@@ -1,23 +1,26 @@
-# Nginx Benchmarking
+# Nginx Benchmarking & Profiling
 
-Bench-marking the server is the process of generating metrics of the throughput, responsiveness and reliability of the application response. This is the precursor to server optimization since the generated metrics serve as as a **_baseline_** that can be used to know the effectiveness of any optimization done.
+Some Techniques for benchmarking and profiling the http servers like Nginx.
 
 
 # Table Of Contents
-- **[Performance testing](#performance-testing)**
-	- **[Introduction](#introduction)**
-	- **[Timeouts](#timeouts)**
-	- **[Baselines](#baselines)**
--  **[Generating metrics with Tools](#generating-metrics-with-tools)**
-	-  **[Siege](#siege)**
-	-  **[Wrk](#wrk)**
-	-  **[K6](#k6)**
-	- **[Visualizing Results](#visualizing-results)**
+- **[Benchmarking](#benchmarking)**
+	- **[Performance testing](#performance-testing)**
+		- **[Introduction](#introduction)**
+		- **[Timeouts](#timeouts)**
+		- **[Baselines](#baselines)**
+	-  **[Generating metrics with Tools](#generating-metrics-with-tools)**
+		-  **[Siege](#siege)**
+		-  **[Wrk](#wrk)**
+		-  **[K6](#k6)**
+		- **[Visualizing Results](#visualizing-results)**
 
+# Benchmarking
+Benchmarking the server is the process of generating metrics of the throughput, responsiveness and reliability of the application response. This is the precursor to server optimization since the generated metrics serve as as a **_baseline_** that can be used to know the effectiveness of any optimization done.
 
-# Performance testing
+## Performance testing
 
-## Introduction 
+### Introduction 
 
 Put the system under pressure to determine various quality attributes. These attributes can server multiple purposes such us : 
 
@@ -52,7 +55,7 @@ The goal is to establish the following parameters:
 	- Rt = Qt + St  ……………………. [ Qt = Queuing Time , St = Service Time]
 ```
 
-#### Timeouts
+### Timeouts
 
 When the server is under load, the average response time increases as the server is
 busy responding to the large number of requests it has received. When the server has
@@ -76,7 +79,7 @@ the error rate and the throughput in different tests, the timeouts should remain
 same. Basically, when we run the test to determine a metric, the other factors should
 remain the same; otherwise, the numbers are difficult to compare.
 
-## Baselines 
+### Baselines 
 A baseline is defined as the accepted attributes that describe a system at a particular point in time. Thus, the baseline serves as a point of reference. The idea is to capture performance metrics after every change and determine their effectiveness by comparing them to the baseline. Changes can only be compared one at a time. While working with baselines, we need to make sure that all aspects except for the single change must remain the same. Thus, the new metrics data, after the change, when compared to the baseline data, will show whether the performance improves or declines.
 
 **Note** : Always run performance tests on a machine other than the server under test. If you run them on the same machine, the numbers generated will be misleading.
@@ -86,11 +89,11 @@ A baseline is defined as the accepted attributes that describe a system at a par
 **Note 3**  : Load simulation opens sockets on the client side. The sockets, in turn, are treated as file descriptors. Thus, make sure there are enough file descriptors available on the box. The limit can be enhanced by the `ulimit -n` command or by changing the `security.limits` file.
 
 
-# Generating metrics with Tools
+## Generating metrics with Tools
 
 There are many tools for load testing your application.
 
-## Siege 
+### Siege 
 
 Siege is an open source regression test and benchmark utility. It can stress test a single URL with a user defined number of simulated users, or it can read many URLs into memory and stress them simultaneously.
 
@@ -141,7 +144,7 @@ A few interesting default parameters to look at are the following:
 **Note 2** : `Siege` and `ab` are single-threaded , while `wrk` is multi-threaded
 
 
-## Wrk
+### Wrk
 wrk is a modern HTTP benchmarking tool capable of generating significant load when run on a single multi-core CPU. It combines a multithreaded design with scalable event notification systems such as epoll and kqueue.
 
 **Benchmark an HTTP endpoint**
@@ -179,7 +182,7 @@ Requests/sec: 748868.53
 Transfer/sec: 606.33MB
 ```
 
-## K6
+### K6
 
 k6 is **a high-performing load testing tool, scriptable in JavaScript**.
 
