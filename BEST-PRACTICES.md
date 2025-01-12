@@ -200,6 +200,46 @@ pcre_jit on;
 
 **Important** : 0-RTT for TLSv1.3 creates a significant security risk called **Replay Attack** , check below for [security](#prevent-replay-attacks-on-0-rtt) best practices to mitigate/eliminate such risk.
 
+#### Activate the cache for connections to upstream servers
+
+> This can greatly reduce the number of new TCP connections, as NGINX can now reuse its existing connections (`keepalive`) per upstream.
+
+> If your upstream server supports Keep-Alive in its config, NGINX will now reuse existing TCP connections without creating new ones. This can greatly reduce the number of sockets in `TIME_WAIT` TCP connections on a busy servers (less work for OS to establish new connections, less packets on a network).
+
+> Keep-Alive connections are only supported as of HTTP/1.1.
+
+```nginx
+# Upstream context:
+upstream backend {
+
+  # Sets the maximum number of idle keepalive connections to upstream servers
+  # that are preserved in the cache of each worker process.
+  keepalive 16;
+
+}
+
+# Server/location contexts:
+server {
+
+  ...
+
+  location / {
+
+    # By default only talks HTTP/1 to the upstream,
+    # keepalive is only enabled in HTTP/1.1:
+    proxy_http_version 1.1;
+
+    # Remove the Connection header if the client sends it,
+    # it could be "close" to close a keepalive connection:
+    proxy_set_header Connection "";
+
+    ...
+
+  }
+
+}
+```
+
 ## External System Settings
 
 **Increase The Maximum Number Of Open Files (`nofile` limit) – Linux**
