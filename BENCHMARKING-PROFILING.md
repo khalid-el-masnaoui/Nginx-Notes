@@ -257,4 +257,4 @@ For **K6** , you can have a nice graphs and dashboards of the generated results 
 
 Profiling is a form of dynamic program analysis that measures, for example, the space (memory) or time complexity of a program, the usage of particular instructions, or the frequency and duration of function calls. Most commonly, profiling information serves to aid program optimization, and more specifically, performance engineering.
 
-**Note**:  Check my repository *_Logging, Monitoring and Alerting_*
+**Note**:  Check my repository **_Logging, Monitoring and Alerting_**
