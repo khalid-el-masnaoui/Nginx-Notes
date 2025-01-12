@@ -13,7 +13,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Compression](#compression)**
 	- **[Client Caching](#client-caching)**
 	- **[SSL Caching](#ssl-caching)**
-	- **[Other Configurations](#other-configurations)
+	- **[Other Configurations](#other-configurations)**
 	- **[External System Settings](#external-system-settings)**
 
 - **[Security](#securoty)**
