@@ -187,6 +187,17 @@ ssl_buffer_size 1400;
 pcre_jit on;
 ```
 
+#### Enable 0-RTT for TLSv1.3
+> Generally speaking, 0-RTT is safe for most web sites and applications. If your web application does strange things and you’re concerned about its replay safety, consider not using 0-RTT until you can be certain that there are no negative effects. [...] TLS 1.3 is a big step forward for web performance and security. By combining TLS 1.3 with 0-RTT, the performance gains are even more dramatic.
+
+```nginx
+  ssl_protocols TLSv1.2 TLSv1.3;
+  # To enable 0-RTT (TLS 1.3):
+  ssl_early_data on;
+```
+
+**Important** : 0-RTT for TLSv1.3 creates a significant security risk called **Replay Attack** , check below for [security](#prevent-replay-attacks-on-0-rtt) best practices to mitigate/eliminate such risk.
+
 ## External System Settings
 
 **Increase The Maximum Number Of Open Files (`nofile` limit) – Linux**
