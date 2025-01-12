@@ -171,6 +171,8 @@ location ~* \.(?:svgz?|ttf|ttc|otf|eot|woff2?)$ {
 ```nginx
 ssl_session_timeout    1d;
 ssl_session_cache      shared:SSL:128m;
+ssl_session_tickets off;
+ssl_buffer_size 1400;
 ```
 
 ## External System Settings
