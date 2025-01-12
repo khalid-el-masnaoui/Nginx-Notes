@@ -275,7 +275,7 @@ cat /proc/{PID}/limits #<== displays the limit
 
 **Note** : We wont be covering linux tunning in details here, you can check my repository (**Linux-Server**) for that
 
-Change the following kernel parameters to increase the number of ephemeral ports, |reduce TIME_WAIT and increase the allowed listen backlog.
+Change the following kernel parameters to increase the number of ephemeral ports,  increase the allowed listen backlog and other tuned configurations.
 
 ```bash
 [root@localhost ~]# vim /etc/sysctl.conf
