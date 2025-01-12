@@ -30,6 +30,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Utilizing the Location Block](#utilizing-the-location-block)**
 	- **[Restrict Access to the Proxy Servers and Local Networks](#restrict-access-to-the-proxy-servers-and-local-networks)**
 	- **[FastCgi Timeouts](#fastcgi-timeouts)**
+	- **[Hide Upstream Proxy Headers](#hide-upstream-proxy-headers)**
 	- **[General Configurations Directives and Best Practices](#general-configurations-directives-and-best-practices)**
 
 # Performance Optimizations
@@ -1131,6 +1132,29 @@ fastcgi_connect_timeout 600;#if need it*
 ...
 ```
 
+##  Hide upstream proxy headers
+
+
+> When NGINX is used to proxy requests to an upstream server (such as a PHP-FPM instance), it can be beneficial to hide certain headers sent in the upstream response (e.g. the version of PHP running).
+
+> You should use `proxy_hide_header` (or Lua module) to hide/remove headers from upstream servers returned to your NGINX reverse proxy (and consequently to the client).
+
+###### Example
+
+```nginx
+# Hide some standard response headers:
+proxy_hide_header X-Powered-By;
+proxy_hide_header X-AspNetMvc-Version;
+proxy_hide_header X-AspNet-Version;
+proxy_hide_header X-Drupal-Cache;
+
+# Hide some Amazon S3 specific response headers:
+proxy_hide_header X-Amz-Id-2;
+proxy_hide_header X-Amz-Request-Id;
+
+# Hide other risky response headers:
+proxy_hide_header X-Runtime;
+```
 
 ## General Configurations Directives and Best Practices
 
