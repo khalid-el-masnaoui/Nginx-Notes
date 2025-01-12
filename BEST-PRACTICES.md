@@ -87,14 +87,9 @@ http {
 	# frequent small bursts of data in real time.
     tcp_nodelay on;
 
-    # allow the server to close connection on non responding client, this will free up memory
+    # allow the server to close connection on non responding client, this will       free up memory
     reset_timedout_connection on;
 
-    # request timed out -- default 60
-    client_body_timeout 10;
-
-    # if client stop responding, free up memory -- default 60
-    send_timeout 2;
 
     # server will close connection after this time -- default 75
     keepalive_timeout 30;
@@ -216,6 +211,12 @@ Change the following kernel parameters to increase the number of ephemeral ports
 
 ```bash
 [root@localhost ~]# vim /etc/sysctl.conf
+
+#buffers
+net.core.wmem_default = 8388608
+net.core.rmem_default = 8388608
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
 
 # ipv4
 net.ipv4.tcp_syncookies=1
@@ -1249,9 +1250,21 @@ large_client_header_buffers 4 256k;
 # read timeout for the request body from client
 client_body_timeout   5;
 
-# how long to wait for the client to send a request header 
+# how long to wait for the client to send a request header (between packets
 client_header_timeout 5;
+
+# if client stop responding (between packets), free up memory-- default 60
+send_timeout 2;
 
 # allow the server to close connection on non responding client, this will free up memory
 reset_timedout_connection on;
+
+ ## Restricted Access directory by password in the access_list file.
+  location ^~ /secure/ {
+		allow 127.0.0.1/32;
+		allow 10.10.10.0/24;
+		deny all;
+		auth_basic "RESTRICTED ACCESS";
+		auth_basic_user_file /var/www/htdocs/secure/access_list;
+	}
   ```
