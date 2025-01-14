@@ -1,4 +1,4 @@
-# Nginx Benchmarking & Profiling
+# Nginx Benchmarking
 
 Some Techniques for benchmarking and profiling the http servers like Nginx.
 
@@ -14,8 +14,6 @@ Some Techniques for benchmarking and profiling the http servers like Nginx.
 		-  **[Wrk](#wrk)**
 		-  **[K6](#k6)**
 		- **[Visualizing Results](#visualizing-results)**
-	
-- **[Profiling](#profiling)**
 
 
 # Benchmarking
@@ -252,9 +250,3 @@ You can read more about this awesome tool by reading [the official documentation
 For **K6** , you can have a nice graphs and dashboards of the generated results with _Prometheus , InfluxDB, Grafana..._
 
 **Gnuplot** is a command-line driven interactive function plotting utility can be used to handle both curves (2 dimensions) and surfaces (3 dimensions).
-
-# Profiling
-
-Profiling is a form of dynamic program analysis that measures, for example, the space (memory) or time complexity of a program, the usage of particular instructions, or the frequency and duration of function calls. Most commonly, profiling information serves to aid program optimization, and more specifically, performance engineering.
-
-**Note**:  We wont cover this topic here , Check my repository **_Logging, Monitoring and Alerting_**, we do cover profiling/monitoring for the whole application stack including Nginx.
