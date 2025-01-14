@@ -1,23 +1,19 @@
 # Nginx Benchmarking
 
-Some Techniques for benchmarking and profiling the http servers like Nginx.
+Benchmarking the server is the process of generating metrics of the throughput, responsiveness and reliability of the application response. This is the precursor to server optimization since the generated metrics serve as as a **_baseline_** that can be used to know the effectiveness of any optimization done.
 
 
 # Table Of Contents
-- **[Benchmarking](#benchmarking)**
-	- **[Performance testing](#performance-testing)**
-		- **[Introduction](#introduction)**
-		- **[Timeouts](#timeouts)**
-		- **[Baselines](#baselines)**
-	-  **[Generating metrics with Tools](#generating-metrics-with-tools)**
-		-  **[Siege](#siege)**
-		-  **[Wrk](#wrk)**
-		-  **[K6](#k6)**
-		- **[Visualizing Results](#visualizing-results)**
+- **[Performance testing](#performance-testing)**
+	- **[Introduction](#introduction)**
+	- **[Timeouts](#timeouts)**
+	- **[Baselines](#baselines)**
+-  **[Generating metrics with Tools](#generating-metrics-with-tools)**
+	-  **[Siege](#siege)**
+	-  **[Wrk](#wrk)**
+	-  **[K6](#k6)**
+	- **[Visualizing Results](#visualizing-results)**
 
-
-# Benchmarking
-Benchmarking the server is the process of generating metrics of the throughput, responsiveness and reliability of the application response. This is the precursor to server optimization since the generated metrics serve as as a **_baseline_** that can be used to know the effectiveness of any optimization done.
 
 ## Performance testing
 
