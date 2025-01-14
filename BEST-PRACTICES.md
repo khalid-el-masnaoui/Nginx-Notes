@@ -1399,3 +1399,7 @@ reset_timedout_connection on;
 		auth_basic_user_file /var/www/htdocs/secure/access_list;
 	}
   ```
+
+
+For even more details and further learning, you can check this github repository:
+[Nginx Admin's Handbook](https://github.com/trimstray/nginx-admins-handbook)
