@@ -491,6 +491,8 @@ Lastly, reload your Nginx configuration with the following command:
 sudo service nginx reload
 ```
 
+For further reading about setting up nginx as a reverse proxy [resource](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+
 ## Free SSL Certificate with Let's Encrypt
 
 In order to set up an SSL website, you're going to need a valid SSL certificate. The good news is that you can get it for free from [Let's Encrypt](https://letsencrypt.org).
