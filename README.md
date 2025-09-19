@@ -5,7 +5,7 @@ In-depth Notes about Nginx, including nginx architecture , FastCGI, nginx CLI, n
 This repository containes a complete _**set**_ of NGINX NOTES organized as follow:
 
 - [Architecture](ARCHITECTURE.md)
-- - [Benchmarking](BENCHMARKING.md)
+- [Benchmarking](BENCHMARKING.md)
 - [Nginx CLI ](COMMANDS.md)
 - [Configurations](CONFIGURATIONS.md)
 - [Nginx Best Practices](BEST-PRACTICES.md)
