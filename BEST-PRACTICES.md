@@ -21,6 +21,7 @@ By following the key recommendations outlined below, you can avoid common config
 	- **[Ensure Nginx Version Information is Not Exposed](#ensure-nginx-version-information-is-not-exposed)**
 	- **[Ensure the autoindex Feature is removed or disabled](#ensure-the-autoindex-feature-is-removed-or-disabled)**
 	- **[Set Proper Permissions for Critical Directories and Files](#set-proper-permissions-for-critical-directories-and-files)**
+	- **[CORS On Nginx](#cors-on-nginx)**
 	- **[Disabling Unused HTTP Methods](#disabling-unused-http-methods)**
 	- **[Ensure Removal of Insecure and Outdated SSL Protocols and Ciphers](#ensure-removal-of-insecure-and-outdated-ssl-protocols-and-ciphers)**
 	- **[Ensure Proper Permissions on SSL Certificate Files](#ensure-proper-permissions-on-ssl-certificate-files)**
@@ -440,6 +441,58 @@ Ensure that the Nginx installation directory and configuration files are accessi
   [root@localhost ~]# chown root:root -R /etc/nginx
   [root@localhost ~]# chmod o-rwx -R /etc/nginx
   ```
+
+## CORS On Nginx
+Cross-Origin Resource Sharing (CORS) on Nginx involves configuring Nginx to include specific HTTP headers in its responses, allowing web pages from different origins (domains, protocols, or ports) to access resources served by Nginx. This is crucial for modern web applications where front-ends and back-ends often reside on separate domains.
+
+```nginx
+add_header Access-Control-Allow-Origin "example.com"; #this header specifies which origins are permitted to access the resource.
+
+add_header Access-Control-Allow-Origin *; #To allow all origins (less secure, use with caution for production):
+
+
+add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always; #Specifies the HTTP methods (e.g., GET, POST, PUT, DELETE, OPTIONS) allowed for cross-origin requests.
+
+
+add_header Access-Control-Allow-Headers "Content-Type, Authorization" always; #Lists the custom headers that can be sent with cross-origin requests.
+
+add_header Access-Control-Allow-Credentials true always; #Indicates whether the browser should include credentials (cookies, HTTP authentication) with the cross-origin request.
+
+add_header Access-Control-Max-Age 3600; #Specifies how long the results of a preflight request (OPTIONS) can be cached by the client.
+
+
+```
+
+A CORS **preflight** is a preliminary HTTP request that a web browser sends to a server to check if the actual cross-origin request is safe and allowed before it sends the main, complex request. This preflight uses the HTTP OPTIONS method and includes headers like Origin, Access-Control-Request-Method, and Access-Control-Request-Headers to inform the server about the upcoming request's details. The server then responds with CORS headers that tell the browser whether to proceed with the main request, which is crucial for preventing security risks. 
+
+#### Example Nginx CORS Configuration:
+
+```nginx
+location / {  
+	# Handle preflight OPTIONS requests  
+	if ($request_method = 'OPTIONS') {  
+		add_header 'Access-Control-Allow-Origin' 'https://frontend.example.com';  
+		add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';  
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+		add_header 'Access-Control-Max-Age' 1728000;  
+		add_header 'Content-Type' 'text/plain charset=UTF-8';  
+		add_header 'Content-Length' 0;  
+		return 204;  
+	}  
+	  
+	# For actual requests  
+	add_header 'Access-Control-Allow-Origin' 'https://frontend.example.com';  
+	add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';  
+	add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization';  
+	  
+	proxy_pass http://your_backend_service;  
+	# ... other proxy settings  
+}
+
+
+```
+
+#### Key CORS Headers and Nginx Configuration:
 
 ## Disabling Unused HTTP Methods
 When unused HTTP methods are enabled on a web service, they can expose vulnerabilities or unintended behaviors that may lead to abuse and become an attack vector. 
