@@ -1,6 +1,16 @@
 
-In-depth Notes about Nginx, including nginx architecture , FastCGI, nginx CLI, nginx configurations , nginx best practices and many other related concepts
 
+```
+  _   _       _            
+ | \ | | __ _(_)_ __ __  __
+ |  \| |/ _` | | '_ \\ \/ /
+ | |\  | (_| | | | | |>  < 
+ |_| \_|\__, |_|_| |_/_/\_\
+        |___/              
+```
+
+
+In-depth Notes about Nginx, including nginx architecture , FastCGI, nginx CLI, nginx configurations , nginx best practices and many other related concepts
 
 This repository containes a complete _**set**_ of NGINX NOTES organized as follow:
 
