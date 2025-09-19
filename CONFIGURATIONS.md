@@ -28,6 +28,7 @@ All you need for Configuring Nginx in one place.
 - **[Setup New Website](#setup-new-website)**
 - **[Setup PHP Website](#setup-php-website)**
 - **[Setup Reverse Proxy](#setup-reverse-proxy)**
+- **[Setup Load Balancer](#setup-load-balancer)**
 - **[Free SSL Certificate with Let's Encrypt](#free-ssl-certificate-with-lets-encrypt)**
     - **[Certbot Installation](#certbot-installation)**
     - **[Get SSL Certificate](#get-ssl-certificate)**
@@ -511,6 +512,58 @@ Next, update your packages index and install the `python-certbot-nginx`:
 sudo apt-get update
 sudo apt-get install -y python-certbot-nginx 
 ```
+
+## Setup Load Balancer
+
+Load balancing across multiple application instances is a commonly used technique for optimizing resource utilization, maximizing throughput, reducing latency, and ensuring fault‑tolerant configurations.
+
+Nginx can be configured to provide load balancing with failover, ensuring high availability for backend services. This setup involves distributing incoming traffic across multiple backend servers and automatically redirecting traffic away from unhealthy or unavailable servers.
+
+```nginx
+http {  
+	upstream backend {
+	    least_conn;
+		server main1.example.com weight=1 max_fails=2 fail_timeout=5;;  
+		server main2.example.com weight=2 max_fails=2 fail_timeout=5;;
+		server backup1.example.com backup weight=1 max_fails=2 fail_timeout=5;
+		server backup2.example.com backup weight=2 max_fails=2 fail_timeout=5; 
+	}  
+  
+	server {  
+		listen 80;  
+		location / {  
+			proxy_pass http://backend; 
+			proxy_next_upstream   error timeout invalid_header http_500 http_502 http_503 http_504;
+	        proxy_connect_timeout   2;
+		}  
+	}
+}
+
+```
+
+* A request is sent to the backend-servers with the least number of active connections. This method also takes server weights into consideration.
+* `weight` parameter is used in load balancing configurations to distribute incoming requests among multiple backend servers based on their relative capacity or performance.
+* `backup` backup servers and do not receive requests unless both of the other servers are unavailable (by order).
+* `max_fails` and `fail_timeout` : if NGINX fails to send a request to a server or does not receive a response from it 2 times in 5 seconds, it marks the server as unavailable for 5 seconds:
+
+* `proxy_next_upstream` : a directive in NGINX controls how NGINX handles failed requests to upstream servers within a defined upstream group. When a request to an upstream server fails under specific conditions, NGINX can be configured to retry the request with the "next" available server in the group instead of immediately returning an error to the client.
+	 - `error`: An error occurred while establishing a connection with the server, sending a request to it, or receiving a response header.
+	- `timeout`: A timeout occurred during connection, sending a request, or receiving a response from the server.
+	- `invalid_header`: The server returned an invalid or empty response header.
+	- `http_500`, `http_502`, `http_503`, `http_504`: The server returned a specific HTTP error status code (Internal Server Error, Bad Gateway, Service Unavailable, Gateway Timeout).
+	- `http_403`, `http_404`: (Less common for `proxy_next_upstream` as these often indicate application-level issues, but can be included if desired).
+	- `non_idempotent`: Retries requests that are not idempotent (e.g., POST requests) if the upstream server fails. Use with caution.
+	- `off`: Disables retrying requests to the next upstream server
+	-  **Idempotency:** Be cautious when using `proxy_next_upstream` with non-idempotent requests (e.g., `POST` requests that modify data), as retrying could lead to duplicate operations on the backend.
+    - **Load Balancing:**  `proxy_next_upstream` works in conjunction with NGINX's load balancing methods (e.g., round-robin, least_conn) to select the initial upstream server.
+
+`proxy_connect_timeout` :a directive that sets the time NGINX waits to establish a connection with an upstream server, and while it doesn't directly perform health checks, it contributes to them by timing out slow connections. To implement more robust health checks in NGINX, you should use directives like `max_fails` and `fail_timeout` within the `upstream` block to define the server as unhealthy after a set number of failed attempts within a specific period.
+
+**Note**: If there is only a single server in a group, the **max_fails** and**fail_timeout** parameters to the server directive are ignored, and the server is never considered unavailable.
+
+**Note**: `proxy_timeout`: This directive sets the timeout for transmitting a request to the proxied server and for receiving a response from it. It's a general timeout for the entire request/response interaction. (including retried requests on which you can also use `proxy_next_upstream_tries`).
+
+For further reading about [nginx load balancing](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/) and [nginx health check](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-health-check/)
 
 ### Get SSL Certificate
 
