@@ -14,6 +14,7 @@ In-depth Notes about nginx , nginx architecture, what is and how FastCGI works a
 	- **[Overview of nginx Architecture](#overview-of-nginx-architecture)**
 	- **[Core Structure](#core-structure)**
 	- **[Workers Model](#workers-model)**
+	- **[Nginx State Machine](#nginx-state-machine)**
 	- **[Nginx Process Roles](#nginx-process-roles)**
 - **[Nginx FastCGI](#nginx-fastcgi)**
 	- **[Introduction](#introduction-1)**
@@ -126,9 +127,26 @@ The NGINX worker processes begin by waiting for events on the listen sockets `ac
 <p align="center">
 <img src="./images/worker_state_machine.png"/>
 </p>
+#### Nginx State Machine
 
 The state machine is a collection of instructions that tells NGINX how to handle a request. The state machine used by most web servers that perform the same duties as NGINX is similar; the difference is in the implementation.
 
+The Nginx state machine can be understood as a practical implementation of a `finite state machine (FSM)`
+* **Finite State Machine (FSM):** 
+	An FSM is a mathematical model of computation that can be in exactly one of a finite number of states at any given time. It transitions between these states in response to inputs, following a defined set of rules.
+
+- **Nginx's Event-Driven Architecture:** 
+    Nginx is known for its event-driven, asynchronous architecture. This means it doesn't block while waiting for I/O operations (like reading from a socket or writing to a file). Instead, it reacts to events as they occur.
+
+- **How Nginx Employs FSM Principles:**
+    - **States:** Nginx processes requests by moving through various distinct stages, which can be considered as states. Examples include:
+        - Reading request headers
+        - Processing request body
+        - Finding the appropriate handler
+        - Generating a response
+        - Sending the response
+    - **Transitions:** Events, such as the completion of a read operation, the arrival of a new part of the request, or the readiness of data to be sent, trigger transitions between these states.
+    - **Inputs and Outputs:** The inputs are the events and data received (e.g., client requests, file data), and the outputs are the actions taken (e.g., sending responses, logging).
 #### Nginx Process Roles
 
 nginx runs several processes in memory; there is a single master process and several `worker` processes. There are also a couple of special purpose processes, specifically a cache loader and cache manager. All processes are single-threaded in version 1.x of nginx. All processes primarily use shared-memory mechanisms for inter-process communication. The master process is run as the `root` user. The cache loader, cache manager and `worker`s run as an unprivileged user.
