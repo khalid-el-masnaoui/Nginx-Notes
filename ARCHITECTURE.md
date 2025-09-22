@@ -127,6 +127,8 @@ The NGINX worker processes begin by waiting for events on the listen sockets `ac
 <p align="center">
 <img src="./images/worker_state_machine.png"/>
 </p>
+
+
 #### Nginx State Machine
 
 The state machine is a collection of instructions that tells NGINX how to handle a request. The state machine used by most web servers that perform the same duties as NGINX is similar; the difference is in the implementation.
